@@ -1,0 +1,29 @@
+<!-- views/notasDeCredito.ejs -->
+<%- include('partials/header') %>
+<link rel="stylesheet" href="/css/styles.css">
+<main class="container">
+    <h1>Notas de Crédito</h1>
+
+    <section class="notas-de-credito">
+        <% if (notasDeCredito.length > 0) { %>
+            <div class="factura-grid">
+                <% notasDeCredito.forEach(nota => { %>
+                    <div class="card-nota-de-credito">
+                        <h2>Folio: <%= nota.folio %></h2>
+                        <p><strong>Razón Social:</strong> <%= nota.razonSocial %></p>
+                        <p><strong>RUT Cliente:</strong> <%= nota.rutCliente %></p>
+                        <p><strong>Tipo de Documento:</strong> <%= nota.tipoDTEString %></p>
+                        <p><strong>Fecha de Emisión:</strong> <%= nota.fechaEmision.toDateString() %></p>
+                        <p><strong>Estado:</strong> <%= nota.estado %></p>
+                        <p><strong>Monto Total:</strong> $<%= nota.montoTotal.toLocaleString() %></p>
+                        <p><strong>Folio Doc Referencia:</strong> <%= nota.folioDocReferencia %></p>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p>No hay notas de crédito disponibles.</p>
+        <% } %>
+    </section>
+</main>
+
+<%- include('partials/footer') %>

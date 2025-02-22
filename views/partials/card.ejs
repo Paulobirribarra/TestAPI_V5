@@ -1,0 +1,29 @@
+<!-- views/partials/card.ejs -->
+<div class="factura-card">
+    <h2>Folio: <%= factura.folio %></h2>
+    <p><strong>Razón Social:</strong> <%= factura.razonSocial %></p>
+    <p><strong>RUT Cliente:</strong> <%= factura.rutCliente %></p>
+    <p><strong>Fecha Emisión:</strong> <%= factura.fechaEmision.toDateString() %></p>
+    <p><strong>Monto Total:</strong> $<%= factura.montoTotal.toLocaleString() %></p>
+    <p><strong>Estado:</strong> <%= factura.estado %></p>
+
+    <!-- Detalles adicionales que se mostrarán al hacer clic -->
+    <div class="detalles" id="detalles-<%= factura.folio %>" style="display:none;">
+        <p><strong>Pagada:</strong> <%= factura.pagada ? 'Sí' : 'No' %></p>
+        <p><strong>Método de Pago:</strong> <%= factura.metodoDePago || 'No especificado' %></p>
+        <p><strong>Comentario:</strong> <%= factura.comentario || 'Sin comentario' %></p>
+    </div>
+
+    <button onclick="toggleDetalles('<%= factura.folio %>')">Ver más</button>
+</div>
+
+<script>
+    function toggleDetalles(folio) {
+        const detalles = document.getElementById('detalles-' + folio);
+        if (detalles.style.display === 'none') {
+            detalles.style.display = 'block';
+        } else {
+            detalles.style.display = 'none';
+        }
+    }
+</script>

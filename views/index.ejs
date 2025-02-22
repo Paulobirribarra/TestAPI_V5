@@ -1,37 +1,37 @@
+<!-- index.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listado de Facturas</title>
-    <link rel="stylesheet" href="/css/styles.css"> <!-- Agrega tu hoja de estilos -->
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body>
-    <%- include('partials/header') %>
-    
-    <main class="container">
-        <h1>Listado de Facturas</h1>
-        
-        <section class="facturas">
-            <% if (facturas.length > 0) { %>
-                <div class="factura-grid">
-                    <% facturas.forEach(factura => { %>
-                        <div class="factura-card">
-                            <h2>Folio: <%= factura.folio %></h2>
-                            <p><strong>Razón Social:</strong> <%= factura.razonSocial %></p>
-                            <p><strong>RUT Cliente:</strong> <%= factura.rutCliente %></p>
-                            <p><strong>Fecha Emisión:</strong> <%= factura.fechaEmision.toDateString() %></p>
-                            <p><strong>Monto Total:</strong> $<%= factura.montoTotal.toLocaleString() %></p>
-                            <p><strong>Estado:</strong> <%= factura.estado %></p>
-                        </div>
-                    <% }) %>
-                </div>
-            <% } else { %>
-                <p>No hay facturas disponibles.</p>
-            <% } %>
-        </section>
-    </main>
-    
-    <%- include('partials/footer') %>
-</body>
+<!-- views/index.ejs -->
+<%- include('partials/header') %>
+
+<main class="container">
+    <h1>Listado de Facturas</h1>
+
+    <section class="facturas">
+        <!-- Enlace al listado de Notas de Crédito -->
+        <a href="/notasDeCredito">Ver Notas de Crédito</a>
+
+        <% if (facturas.length > 0) { %>
+            <div class="factura-grid">
+                <% facturas.forEach(factura => { %>
+                    <!-- Verificamos que la factura no tenga una nota de crédito asociada -->
+                    <% if (!factura.folioDocReferencia) { %>
+                        <%- include('partials/card', { factura: factura }) %>
+                    <% } %>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <p>No hay facturas disponibles.</p>
+        <% } %>
+    </section>
+</main>
+
+<%- include('partials/footer') %>
+
 </html>
