@@ -1,11 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facturas Guardadas</title>
-</head>
-<body>
-    
-</body>
-</html>
+<!-- views/partials/header.ejs -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">FacturasApp</a>
+            <ul class="nav-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/consulta">Consultar Facturas</a></li>
+                <li><a href="/configuracion">Configuración</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<!-- views/partials/footer.ejs -->
+<footer>
+    <div class="container">
+        <p>&copy; <%= new Date().getFullYear() %> FacturasApp. Todos los derechos reservados.</p>
+    </div>
+</footer>

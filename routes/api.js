@@ -2,7 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-require('dotenv').config({path:'.env'});
+require('dotenv').config({ path: '.env' });
+const Facturas = require('../models/Facturas');
+const procesarFacturas = require('../config/procesarFacturas');
 
 const API_URL = process.env.API_URL;
 const USER_API = process.env.USER_API;
@@ -16,7 +18,7 @@ const DETALLADO = process.env.DETALLADO;
 
 
 router.get('/consulta', async (req, res) => {
-    try{
+    try {
         const mes = req.query.mes || '01';
         const anio = req.query.anio || '2024';
         const url = `${API_URL}/api/RCV/ventas/${mes}/${anio}`;
@@ -35,12 +37,21 @@ router.get('/consulta', async (req, res) => {
         console.log("🔍 Headers:", headers);
         console.log(`Esta es la URL completa a enviar: ${url}`);
 
-        const response = await axios.post(url, body, {headers});
+        const response = await axios.post(url, body, { headers });
         console.log("✅ Respuesta de la API:", response.data);
         console.log("🧐 Respuesta completa de la API:", response.headers);
 
+        //llamamos a la funsion para procesar las facturas 
+        const facturas = procesarFacturas(response.data.ventas.detalleVentas);
+
+        //guardar en mongo
+        const result = await Facturas.insertMany(facturas);
+        //console.log(`Facturas insertadas en la base de datos: ${result}`);
+
         res.json(response.data);
-    }catch (error){
+
+
+    } catch (error) {
         console.error("Error en la consulta:", error.response?.data || error.message);
         if (error.response?.status === 401) {
             return res.status(401).json({ error: "Error de autenticación en Simple API" });
@@ -55,14 +66,7 @@ router.get('/consulta', async (req, res) => {
 });
 
 
-// console.log(`${RUT_USUARIO_SII}`);
-// console.log(`${PASSWORD_SII}`);
-// console.log(`${RUT_EMPRESA}`);
-// console.log(AMBIENTE);
-// console.log(DETALLADO);
-// console.log(`${USER_API}`)
-// console.log(`${PASSWORD_API}`)
-// console.log(`${API_URL}`)
+
 
 
 module.exports = router;

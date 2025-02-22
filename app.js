@@ -13,6 +13,10 @@ app.use(express.json());
 
 //Importar Rutas
 const routeAPI = require('./routes/api');
+const conectarDB = require('./config/BDConection');
+
+//Coneccion a mongo
+conectarDB();
 
 //Usar Rutas Importadas esto hace que todas las rutas que vienen de api.js se monten en /api/consultas 
 app.use('/api', routeAPI);
