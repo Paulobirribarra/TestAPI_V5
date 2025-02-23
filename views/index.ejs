@@ -20,15 +20,13 @@
         <% if (facturas.length > 0) { %>
             <div class="factura-grid">
                 <% facturas.forEach(factura => { %>
-                    <!-- Verificamos que la factura no tenga una nota de crédito asociada -->
-                    <% if (!factura.folioDocReferencia) { %>
-                        <%- include('partials/card', { factura: factura }) %>
-                    <% } %>
+                    <%- include('partials/card', { factura: factura }) %>
                 <% }) %>
             </div>
         <% } else { %>
-            <p>No hay facturas disponibles.</p>
+            <p>No hay facturas disponibles. <a href="/consulta">Consulta facturas</a> para agregar nuevas.</p>
         <% } %>
+
     </section>
 </main>
 

@@ -5,6 +5,7 @@
     <h1>Notas de Crédito</h1>
 
     <section class="notas-de-credito">
+        <a href="/">Volver al Inicio</a>
         <% if (notasDeCredito.length > 0) { %>
             <div class="factura-grid">
                 <% notasDeCredito.forEach(nota => { %>
@@ -21,7 +22,7 @@
                 <% }) %>
             </div>
         <% } else { %>
-            <p>No hay notas de crédito disponibles.</p>
+            <p>No hay notas de crédito disponibles. <a href="/consulta">Consulta facturas</a> para agregar nuevas.</p>
         <% } %>
     </section>
 </main>

@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Consultar Facturas</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css" />
     <style>
-        /* Estilo básico para el mensaje de éxito */
         #mensajeExito {
             background-color: #28a745;
             color: white;
@@ -16,14 +15,20 @@
             border-radius: 5px;
             display: none;
         }
-
-        /* Estilo básico para el ícono de carga */
+        #mensajeError {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+            border-radius: 5px;
+            display: none;
+        }
         #loadingIcon {
             display: none;
             text-align: center;
             margin-top: 20px;
         }
-
         #loadingIcon img {
             width: 50px;
             height: 50px;
@@ -45,38 +50,53 @@
 
             <div id="fecha-container">
                 <label for="fecha">Selecciona una Fecha:</label>
-                <input type="date" id="fecha">
+                <input type="date" id="fecha" />
             </div>
 
             <div id="mes-container" style="display: none;">
                 <label for="mes">Mes:</label>
-                <input type="month" id="mes">
+                <input type="month" id="mes" />
             </div>
 
             <button type="submit">Consultar</button>
         </form>
 
-        <!-- Ícono de carga -->
         <div id="loadingIcon">
-            <img src="/path/to/loading-icon.gif" alt="Cargando..." />
+            <img src="/img/loading-icon.gif" alt="Cargando..." />
         </div>
 
-        <!-- Mensaje de éxito -->
-        <div id="mensajeExito">Consulta realizada con éxito. Puedes volver al inicio para ver los datos.</div>
+        <div id="mensajeExito">
+            ✅ Consulta realizada con éxito.
+        </div>
+
+        <div id="mensajeError">
+            ❌ Error en la consulta. Inténtalo de nuevo.
+        </div>
 
         <div id="resultado"></div>
     </main>
 
     <script>
-        document.getElementById('tipoConsulta').addEventListener('change', function() {
-            if (this.value === 'dia') {
-                document.getElementById('fecha-container').style.display = 'block';
-                document.getElementById('mes-container').style.display = 'none';
-            } else {
-                document.getElementById('fecha-container').style.display = 'none';
-                document.getElementById('mes-container').style.display = 'block';
-            }
+        document.getElementById('tipoConsulta').addEventListener('change', function () {
+            let tipo = this.value;
+            document.getElementById('fecha-container').style.display = (tipo === 'dia') ? 'block' : 'none';
+            document.getElementById('mes-container').style.display = (tipo === 'mes') ? 'block' : 'none';
         });
+
+        // Función para realizar fetch con timeout
+        async function fetchConTimeout(url, timeout = 20000) { // 20 segundos
+            const controlador = new AbortController();
+            const id = setTimeout(() => controlador.abort(), timeout);
+
+            try {
+                let response = await fetch(url, { signal: controlador.signal });
+                clearTimeout(id);
+                return response;
+            } catch (error) {
+                console.error("🚨 Timeout o error de red:", error);
+                throw new Error("La consulta tardó demasiado. Inténtalo de nuevo.");
+            }
+        }
 
         document.getElementById('consulta-form').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -84,29 +104,61 @@
             let tipo = document.getElementById('tipoConsulta').value;
             let url = '/api/consulta';
 
-            // Muestra el ícono de carga
             document.getElementById('loadingIcon').style.display = 'block';
+            document.getElementById('mensajeExito').style.display = 'none';
+            document.getElementById('mensajeError').style.display = 'none';
+            document.getElementById('resultado').innerHTML = '';
 
-            if (tipo === 'dia') {
-                let fecha = document.getElementById('fecha').value;
-                url += `?fecha=${fecha}`;
-            } else {
-                let mes = document.getElementById('mes').value.split('-');
-                url += `?mes=${mes[1]}&anio=${mes[0]}`;
+            try {
+                if (tipo === 'dia') {
+                    let fecha = document.getElementById('fecha').value;
+                    if (!fecha) {
+                        alert("Por favor, selecciona una fecha.");
+                        return;
+                    }
+                    url += `?fecha=${fecha}`;
+                } else {
+                    let mes = document.getElementById('mes').value;
+                    if (!mes) {
+                        alert("Por favor, selecciona un mes.");
+                        return;
+                    }
+                    let [anio, mesNum] = mes.split('-');
+                    url += `?mes=${mesNum}&anio=${anio}`;
+                }
+
+                let response = await fetchConTimeout(url, 20000); // Esperar hasta 20 segundos
+                let text = await response.text(); // Leer respuesta como texto
+
+                console.log("📥 Respuesta sin procesar:", text);
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (error) {
+                    console.error("❌ Error parseando JSON:", error);
+                    document.getElementById('mensajeError').style.display = 'block';
+                    document.getElementById('resultado').innerHTML = `<p style="color: red;">Error en la respuesta del servidor.<br>Respuesta cruda:<br>${text}</p>`;
+                    return;
+                }
+
+                // Si la respuesta es válida o contiene datos, mostrar mensaje de éxito
+                if (response.ok || data) {
+                    console.log("✅ Respuesta JSON recibida:", data);
+                    document.getElementById('mensajeExito').style.display = 'block';
+                    document.getElementById('resultado').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    console.error("⚠️ Error en la respuesta del servidor:", response.status, data);
+                    document.getElementById('mensajeError').style.display = 'block';
+                    document.getElementById('resultado').innerHTML = `<p style="color: red;">Error: ${data.error || "Error desconocido."}</p>`;
+                }
+            } catch (error) {
+                console.error("❌ Error en la consulta:", error);
+                document.getElementById('mensajeError').style.display = 'block';
+                document.getElementById('resultado').innerHTML = `<p style="color: red;">${error.message}</p>`;
+            } finally {
+                document.getElementById('loadingIcon').style.display = 'none';
             }
-
-            // Realizar la consulta a la API
-            let response = await fetch(url);
-            let data = await response.json();
-
-            // Ocultar el ícono de carga
-            document.getElementById('loadingIcon').style.display = 'none';
-
-            // Mostrar el mensaje de éxito
-            document.getElementById('mensajeExito').style.display = 'block';
-
-            // Mostrar el resultado de la consulta
-            document.getElementById('resultado').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
         });
     </script>
 

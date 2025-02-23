@@ -1,4 +1,3 @@
-//api.js
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
@@ -17,17 +16,21 @@ const AMBIENTE = Number(process.env.AMBIENTE);
 // Ruta para consultar facturas por día o por mes
 router.get('/consulta', async (req, res) => {
     try {
+        console.log("🟢 Recibida consulta con parámetros:", req.query); // Verifica los parámetros recibidos
+
         const { fecha, mes, anio } = req.query;
         let url = '';
 
-        // Si se pasa una fecha, la consulta es por día
-        if (fecha) {
-            const [dia, mes, anio] = fecha.split('-');
-            url = `${API_URL}/api/RCV/ventas/${anio}/${mes}/${dia}`;
-        } else if (mes && anio) {
+        if (fecha) { 
+            const [anio, mes, dia] = fecha.split('-');
+            url = `${API_URL}/api/RCV/ventas/${dia}/${mes}/${anio}`;
+            console.log("📆 Consultando por día:", fecha, "→ URL generada:", url);
+        } else if (mes && anio) { 
             url = `${API_URL}/api/RCV/ventas/${mes}/${anio}`;
+            console.log("📅 Consultando por mes:", mes, anio, "→ URL generada:", url);
         } else {
-            return res.status(400).json({ error: "Debes proporcionar una fecha (DD-MM-YYYY) o un mes y año (MM-YYYY)." });
+            console.warn("⚠️ Parámetros inválidos en la consulta.");
+            return res.status(400).json({ error: "Debes proporcionar una fecha (YYYY-MM-DD) o un mes y año (YYYY-MM)." });
         }
 
         const body = {
@@ -37,39 +40,44 @@ router.get('/consulta', async (req, res) => {
             Ambiente: AMBIENTE
         };
 
+        console.log("📤 Enviando solicitud a la API con body:", body);
+
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Basic ' + Buffer.from(`${USER_API}:${PASSWORD_API}`).toString('base64')
         };
 
-        console.log("🔍 URL enviada:", url);
-        //console.log("🔍 Body:", body);
+        console.log("🔐 Headers enviados:", headers);
 
         const response = await axios.post(url, body, { headers });
-        //console.log("✅ Respuesta de la API:", response.data);
 
-        // Verifica si los datos de la API son válidos
+        console.log("✅ Respuesta de la API recibida:", response.data);
+
         if (!response.data || !response.data.ventas || !response.data.ventas.detalleVentas) {
+            console.warn("⚠️ Respuesta de la API no contiene ventas válidas.");
             return res.status(400).json({ error: "No se encontraron ventas en la respuesta de la API." });
         }
 
-        // Procesa las facturas
+        console.log("📦 Datos de ventas obtenidos:", response.data.ventas.detalleVentas);
+
         const facturas = procesarFacturas(response.data.ventas.detalleVentas);
-        
+
+        console.log("🔄 Facturas procesadas:", facturas);
+
         if (facturas.length === 0) {
+            console.warn("⚠️ No se procesaron facturas.");
             return res.status(400).json({ error: "No se procesaron facturas." });
         }
 
-        // Guarda las facturas en la base de datos
         try {
             const result = await Facturas.insertMany(facturas);
-            //console.log("✅ Facturas guardadas:", result);
+            console.log("💾 Facturas guardadas en la base de datos:", result);
         } catch (dbError) {
-            console.error("❌ Error al guardar las facturas:", dbError);
+            console.error("❌ Error al guardar las facturas en la base de datos:", dbError);
             return res.status(500).json({ error: "Error al guardar las facturas en la base de datos." });
         }
 
-        // Pasar solo los datos necesarios para renderizar la vista
+        console.log("🟢 Enviando respuesta a la vista.");
         res.render('consultarFacturas', { consultaRealizada: true, facturas: facturas });
 
     } catch (error) {
@@ -77,6 +85,5 @@ router.get('/consulta', async (req, res) => {
         res.status(500).json({ error: error.response?.data || "Error en la consulta" });
     }
 });
-
 
 module.exports = router;
