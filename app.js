@@ -36,18 +36,23 @@ app.use('/api', routeAPI);
 app.use('/', indexRoutes);  // Ruta principal
 app.use('/notasDeCredito', notasDeCreditoRoutes);  // Ruta para notas de crédito
 
+app.get('/consulta', (req, res) => {
+    res.render('consultarFacturas'); // Renderiza la vista correctamente
+});
+
+
 //Iniciar Servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`)
 });
 
-// //Ruta PRINCIPAL
+//Ruta PRINCIPAL
 // app.get('/', async (req, res) => {
 //     try{
-//         //consultamos las facturas de la base  de datos mongo local
+            //consultamos las facturas de la base  de datos mongo local
 //         const facturas = await Facturas.find();
 
-//         // renderizamos la vista index.ejs pasando las facturas como datos
+            // renderizamos la vista index.ejs pasando las facturas como datos
 //         res.render('index', {facturas});
 //     }catch (error){
 //         console.log("Error al obtener las facturas de la base local", error.message);

@@ -9,64 +9,74 @@ const procesarFacturas = require('../config/procesarFacturas');
 const API_URL = process.env.API_URL;
 const USER_API = process.env.USER_API;
 const PASSWORD_API = process.env.PASSWORD_API;
-
 const RUT_USUARIO_SII = String(process.env.RUT_USUARIO);
 const RUT_EMPRESA = String(process.env.RUT_EMPRESA);
 const PASSWORD_SII = String(process.env.PASSWORD_SII);
 const AMBIENTE = Number(process.env.AMBIENTE);
-const DETALLADO = process.env.DETALLADO;
 
-
+// Ruta para consultar facturas por día o por mes
 router.get('/consulta', async (req, res) => {
     try {
-        const mes = req.query.mes || '01';
-        const anio = req.query.anio || '2024';
-        const url = `${API_URL}/api/RCV/ventas/${mes}/${anio}`;
+        const { fecha, mes, anio } = req.query;
+        let url = '';
+
+        // Si se pasa una fecha, la consulta es por día
+        if (fecha) {
+            const [dia, mes, anio] = fecha.split('-');
+            url = `${API_URL}/api/RCV/ventas/${anio}/${mes}/${dia}`;
+        } else if (mes && anio) {
+            url = `${API_URL}/api/RCV/ventas/${mes}/${anio}`;
+        } else {
+            return res.status(400).json({ error: "Debes proporcionar una fecha (DD-MM-YYYY) o un mes y año (MM-YYYY)." });
+        }
+
         const body = {
             RutUSuario: RUT_USUARIO_SII,
             PassWordSII: PASSWORD_SII,
             RutEmpresa: RUT_EMPRESA,
             Ambiente: AMBIENTE
         };
+
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Basic ' + Buffer.from(`${USER_API}:${PASSWORD_API}`).toString('base64')
         };
-        // 📌 Log para verificar que los datos están bien formateados antes de enviarlos
-        console.log("🔍 Enviando consulta con body:", body);
-        console.log("🔍 Headers:", headers);
-        console.log(`Esta es la URL completa a enviar: ${url}`);
+
+        console.log("🔍 URL enviada:", url);
+        //console.log("🔍 Body:", body);
 
         const response = await axios.post(url, body, { headers });
-        console.log("✅ Respuesta de la API:", response.data);
-        console.log("🧐 Respuesta completa de la API:", response.headers);
+        //console.log("✅ Respuesta de la API:", response.data);
 
-        //llamamos a la funsion para procesar las facturas 
+        // Verifica si los datos de la API son válidos
+        if (!response.data || !response.data.ventas || !response.data.ventas.detalleVentas) {
+            return res.status(400).json({ error: "No se encontraron ventas en la respuesta de la API." });
+        }
+
+        // Procesa las facturas
         const facturas = procesarFacturas(response.data.ventas.detalleVentas);
+        
+        if (facturas.length === 0) {
+            return res.status(400).json({ error: "No se procesaron facturas." });
+        }
 
-        //guardar en mongo
-        const result = await Facturas.insertMany(facturas);
-        //console.log(`Facturas insertadas en la base de datos: ${result}`);
+        // Guarda las facturas en la base de datos
+        try {
+            const result = await Facturas.insertMany(facturas);
+            //console.log("✅ Facturas guardadas:", result);
+        } catch (dbError) {
+            console.error("❌ Error al guardar las facturas:", dbError);
+            return res.status(500).json({ error: "Error al guardar las facturas en la base de datos." });
+        }
 
-        res.json(response.data);
-
+        // Pasar solo los datos necesarios para renderizar la vista
+        res.render('consultarFacturas', { consultaRealizada: true, facturas: facturas });
 
     } catch (error) {
-        console.error("Error en la consulta:", error.response?.data || error.message);
-        if (error.response?.status === 401) {
-            return res.status(401).json({ error: "Error de autenticación en Simple API" });
-        }
-
-        if (error.response?.status === 400 && error.response?.data?.mensaje?.includes('Error de autenticación en el SII')) {
-            return res.status(400).json({ error: "Las credenciales del SII no son válidas." });
-        }
-
+        console.error("❌ Error en la consulta:", error.response?.data || error.message);
         res.status(500).json({ error: error.response?.data || "Error en la consulta" });
     }
 });
-
-
-
 
 
 module.exports = router;
