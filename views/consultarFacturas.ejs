@@ -73,23 +73,23 @@
             ❌ Error en la consulta. Inténtalo de nuevo.
         </div>
 
-        <div id="resultado"></div>
+        <section class="facturas" id="resultado">
+            <!-- Aquí se mostrarán las facturas dinámicamente -->
+        </section>
     </main>
 
     <script>
         document.getElementById('tipoConsulta').addEventListener('change', function () {
-            let tipo = this.value;
-            document.getElementById('fecha-container').style.display = (tipo === 'dia') ? 'block' : 'none';
-            document.getElementById('mes-container').style.display = (tipo === 'mes') ? 'block' : 'none';
+            const tipo = this.value;
+            document.getElementById('fecha-container').style.display = tipo === 'dia' ? 'block' : 'none';
+            document.getElementById('mes-container').style.display = tipo === 'mes' ? 'block' : 'none';
         });
 
-        // Función para realizar fetch con timeout
-        async function fetchConTimeout(url, timeout = 20000) { // 20 segundos
+        async function fetchConTimeout(url, timeout = 20000) {
             const controlador = new AbortController();
             const id = setTimeout(() => controlador.abort(), timeout);
-
             try {
-                let response = await fetch(url, { signal: controlador.signal });
+                const response = await fetch(url, { signal: controlador.signal });
                 clearTimeout(id);
                 return response;
             } catch (error) {
@@ -101,7 +101,7 @@
         document.getElementById('consulta-form').addEventListener('submit', async function(event) {
             event.preventDefault();
 
-            let tipo = document.getElementById('tipoConsulta').value;
+            const tipo = document.getElementById('tipoConsulta').value;
             let url = '/api/consulta';
 
             document.getElementById('loadingIcon').style.display = 'block';
@@ -111,46 +111,45 @@
 
             try {
                 if (tipo === 'dia') {
-                    let fecha = document.getElementById('fecha').value;
+                    const fecha = document.getElementById('fecha').value;
                     if (!fecha) {
                         alert("Por favor, selecciona una fecha.");
                         return;
                     }
                     url += `?fecha=${fecha}`;
                 } else {
-                    let mes = document.getElementById('mes').value;
+                    const mes = document.getElementById('mes').value;
                     if (!mes) {
                         alert("Por favor, selecciona un mes.");
                         return;
                     }
-                    let [anio, mesNum] = mes.split('-');
+                    const [anio, mesNum] = mes.split('-');
                     url += `?mes=${mesNum}&anio=${anio}`;
                 }
 
-                let response = await fetchConTimeout(url, 20000); // Esperar hasta 20 segundos
-                let text = await response.text(); // Leer respuesta como texto
+                const response = await fetchConTimeout(url, 20000);
+                const data = await response.json();
 
-                console.log("📥 Respuesta sin procesar:", text);
+                console.log("✅ Respuesta JSON recibida:", data);
 
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (error) {
-                    console.error("❌ Error parseando JSON:", error);
-                    document.getElementById('mensajeError').style.display = 'block';
-                    document.getElementById('resultado').innerHTML = `<p style="color: red;">Error en la respuesta del servidor.<br>Respuesta cruda:<br>${text}</p>`;
-                    return;
-                }
-
-                // Si la respuesta es válida o contiene datos, mostrar mensaje de éxito
-                if (response.ok || data) {
-                    console.log("✅ Respuesta JSON recibida:", data);
+                if (response.ok && data.consultaRealizada && data.facturas.length > 0) {
                     document.getElementById('mensajeExito').style.display = 'block';
-                    document.getElementById('resultado').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+
+                    // Generar HTML para mostrar las facturas
+                    const facturasHTML = data.facturas.map(factura => `
+                        <div class="factura-card">
+                            <h2>Folio: ${factura.folio}</h2>
+                            <p><strong>Razón Social:</strong> ${factura.razonSocial}</p>
+                            <p><strong>RUT Cliente:</strong> ${factura.rutCliente}</p>
+                            <p><strong>Fecha Emisión:</strong> ${new Date(factura.fechaEmision).toDateString()}</p>
+                            <p><strong>Monto Total:</strong> $${factura.montoTotal.toLocaleString()}</p>
+                            <p><strong>Estado:</strong> ${factura.estado}</p>
+                        </div>
+                    `).join('');
+
+                    document.getElementById('resultado').innerHTML = `<div class="factura-grid">${facturasHTML}</div>`;
                 } else {
-                    console.error("⚠️ Error en la respuesta del servidor:", response.status, data);
-                    document.getElementById('mensajeError').style.display = 'block';
-                    document.getElementById('resultado').innerHTML = `<p style="color: red;">Error: ${data.error || "Error desconocido."}</p>`;
+                    throw new Error(data.error || "No se encontraron facturas.");
                 }
             } catch (error) {
                 console.error("❌ Error en la consulta:", error);

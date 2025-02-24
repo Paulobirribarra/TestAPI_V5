@@ -16,7 +16,7 @@ const AMBIENTE = Number(process.env.AMBIENTE);
 // Ruta para consultar facturas por día o por mes
 router.get('/consulta', async (req, res) => {
     try {
-        console.log("🟢 Recibida consulta con parámetros:", req.query); // Verifica los parámetros recibidos
+        console.log("🟢 Recibida consulta con parámetros:", req.query);
 
         const { fecha, mes, anio } = req.query;
         let url = '';
@@ -32,23 +32,18 @@ router.get('/consulta', async (req, res) => {
             console.warn("⚠️ Parámetros inválidos en la consulta.");
             return res.status(400).json({ error: "Debes proporcionar una fecha (YYYY-MM-DD) o un mes y año (YYYY-MM)." });
         }
-
         const body = {
             RutUSuario: RUT_USUARIO_SII,
             PassWordSII: PASSWORD_SII,
             RutEmpresa: RUT_EMPRESA,
             Ambiente: AMBIENTE
         };
-
         console.log("📤 Enviando solicitud a la API con body:", body);
 
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Basic ' + Buffer.from(`${USER_API}:${PASSWORD_API}`).toString('base64')
         };
-
-        console.log("🔐 Headers enviados:", headers);
-
         const response = await axios.post(url, body, { headers });
 
         console.log("✅ Respuesta de la API recibida:", response.data);
@@ -57,28 +52,17 @@ router.get('/consulta', async (req, res) => {
             console.warn("⚠️ Respuesta de la API no contiene ventas válidas.");
             return res.status(400).json({ error: "No se encontraron ventas en la respuesta de la API." });
         }
-
-        console.log("📦 Datos de ventas obtenidos:", response.data.ventas.detalleVentas);
-
         const facturas = procesarFacturas(response.data.ventas.detalleVentas);
-
-        console.log("🔄 Facturas procesadas:", facturas);
 
         if (facturas.length === 0) {
             console.warn("⚠️ No se procesaron facturas.");
             return res.status(400).json({ error: "No se procesaron facturas." });
         }
+        await Facturas.insertMany(facturas);
+        console.log("💾 Facturas guardadas en la base de datos");
 
-        try {
-            const result = await Facturas.insertMany(facturas);
-            console.log("💾 Facturas guardadas en la base de datos:", result);
-        } catch (dbError) {
-            console.error("❌ Error al guardar las facturas en la base de datos:", dbError);
-            return res.status(500).json({ error: "Error al guardar las facturas en la base de datos." });
-        }
-
-        console.log("🟢 Enviando respuesta a la vista.");
-        res.render('consultarFacturas', { consultaRealizada: true, facturas: facturas });
+        // Devolver JSON en lugar de renderizar la vista
+        res.json({ consultaRealizada: true, facturas });
 
     } catch (error) {
         console.error("❌ Error en la consulta:", error.response?.data || error.message);
