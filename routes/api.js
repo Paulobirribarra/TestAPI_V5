@@ -101,4 +101,38 @@ router.get('/consulta', async (req, res) => {
     }
 });
 
+
+// Ruta temporal para actualizar facturas con tipoDocReferencia: 48
+router.get('/actualizar-facturas-pagadas', async (req, res) => {
+    try {
+        // Buscar facturas con tipoDocReferencia: 48 y pagada: false
+        const facturas = await Facturas.find({
+            tipoDocReferencia: 48,
+            pagada: false
+        });
+
+        console.log(`📋 Facturas encontradas para actualizar: ${facturas.length}`);
+
+        // Actualizar cada factura encontrada
+        for (const factura of facturas) {
+            await Facturas.updateOne(
+                { _id: factura._id },
+                {
+                    pagada: true,
+                    estado: 'Pagada',
+                    metodoDePago: 'contado', // Ajusta este valor si es necesario
+                    pagadaAutomaticamente: true,
+                    numeroDeOperacion: factura.folioDocReferencia
+                }
+            );
+        }
+
+        console.log('✅ Facturas actualizadas correctamente');
+        res.json({ success: true, message: 'Facturas actualizadas correctamente' });
+    } catch (error) {
+        console.error('❌ Error al actualizar facturas:', error);
+        res.status(500).json({ error: 'Error al actualizar las facturas' });
+    }
+});
+
 module.exports = router;

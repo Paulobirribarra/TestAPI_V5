@@ -92,6 +92,11 @@
     color: #333;
 }
 
+.factura-card.pagada {
+    background-color: #d4edda; /* Verde claro */
+    border: 2px solid #c3e6cb; /* Borde verde para mayor contraste */
+}
+
 /* Contenedor principal */
 .container {
     width: 80%;

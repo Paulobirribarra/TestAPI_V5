@@ -1,5 +1,6 @@
 const procesarFacturas = (detalleVentas) => {
     return detalleVentas.map(factura => {
+        const pagada = (factura.tipoDocReferencia === 48);
         return {
             folio: factura.folio,
             razonSocial: factura.razonSocial,
@@ -8,7 +9,7 @@ const procesarFacturas = (detalleVentas) => {
             tipoDTEString: factura.tipoDTEString,
             folioDocReferencia: factura.folioDocReferencia,
             fechaEmision: new Date(factura.fechaEmision),
-            estado: factura.estado || 'Pendiente',
+            estado: pagada ? 'Pagada' : 'Pendiente', // Estado automático
             montoNeto: factura.montoNeto,
             montoIVA: factura.montoIva,
             montoTotal: factura.montoTotal,
@@ -17,12 +18,10 @@ const procesarFacturas = (detalleVentas) => {
             dia: new Date(factura.fechaEmision).getDate(),
             mes: new Date(factura.fechaEmision).getMonth() + 1,
             anio: new Date(factura.fechaEmision).getFullYear(),
-            pagada: false,
-            metodoDePago: '',
+            pagada: pagada, // Campo booleano para indicar si está pagada
+            metodoDePago: pagada ? 'contado' : '', // Opcional, ajusta según necesites
             comentario: '',
-            pagadaAutomaticamente: false,
-            numeroDeOperacion: '',
-            tipoDocReferencia: factura.tipoDocReferencia || 0
+            numeroDeOperacion: pagada ? factura.folioDocReferencia : ''
         };
     });
 };
