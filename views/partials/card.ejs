@@ -7,8 +7,8 @@
     <p><strong>Monto Total:</strong> $<%= factura.montoTotal.toLocaleString() %></p>
     <p><strong>Estado:</strong> <%= factura.estado %></p>
 
-    <!-- Detalles adicionales que se mostrarán al hacer clic -->
-    <div class="detalles" id="detalles-<%= factura.folio %>" style="display:none;">
+    <!-- Detalles adicionales con transición -->
+    <div class="detalles" id="detalles-<%= factura.folio %>">
         <p><strong>Pagada:</strong> <%= factura.pagada ? 'Sí' : 'No' %></p>
         <p><strong>Método de Pago:</strong> <%= factura.metodoDePago || 'No especificado' %></p>
         <p><strong>Comentario:</strong> <%= factura.comentario || 'Sin comentario' %></p>
@@ -20,10 +20,6 @@
 <script>
     function toggleDetalles(folio) {
         const detalles = document.getElementById('detalles-' + folio);
-        if (detalles.style.display === 'none') {
-            detalles.style.display = 'block';
-        } else {
-            detalles.style.display = 'none';
-        }
+        detalles.classList.toggle('visible');
     }
 </script>
