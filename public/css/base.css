@@ -1,0 +1,30 @@
+/* Configuración General */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fc;
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedor Principal */
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Tipografía */
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 32px;
+    margin-bottom: 30px;
+}

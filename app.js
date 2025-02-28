@@ -1,37 +1,27 @@
-//app.js
-const express = require('express');
-const mongoose = require('mongoose');
-const path = require('path');
-require('dotenv').config({ path: '.env' });
+// app.js
+const { app, PORT } = require('./config/server');
+const connectDB = require('./config/database');
 
-//servidor 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// Rutas
+const apiRoutes = require('./routes/api');
+const indexRoutes = require('./routes/index');
+const notasDeCreditoRoutes = require('./routes/notasDeCredito');
+const configRoutes = require('./routes/config');
 
-//Middleware para parsear JSON
-app.use(express.json());
+// Conectar a la base de datos
+connectDB();
 
-//Importar Rutas
-const routeAPI = require('./routes/api');
-const conectarDB = require('./config/BDConection');
+// Montar rutas
+app.use('/api', apiRoutes);
+app.use('/', indexRoutes);
+app.use('/notasDeCredito', notasDeCreditoRoutes);
+app.use('/configuracion', configRoutes);
+app.use(require('./middleware/errorHandler'));
 
-//Coneccion a mongo
-conectarDB();
+// Ruta específica para consulta
+app.get('/consulta', (req, res) => res.render('consultarFacturas'));
 
-//Usar Rutas Importadas esto hace que todas las rutas que vienen de api.js se monten en /api/consultas 
-app.use('/api', routeAPI);
-
-//Iniciar Servidor
+// Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`)
-});
-
-//Ruta PRINCIPAL
-app.get('/', (req, res) => {
-    res.redirect('/api/consulta');
-});
-
-app.use((req, res, next) => {
-    console.log(`📌 Se recibió una solicitud en: ${req.originalUrl}`);
-    next();
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

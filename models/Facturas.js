@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const modeloBDFacturas = new mongoose.Schema({
     folio: Number,
@@ -17,11 +18,15 @@ const modeloBDFacturas = new mongoose.Schema({
     dia: Number,
     mes: Number,
     anio: Number,
-    pagada: {type: Boolean, default: false},
-    fechaDePago: Date,
-    metodoDePago: String,
-    comentario: String,
-    numeroDeOperacion: Number
+    pagada: { type: Boolean, default: false },
+    metodoDePago: { type: String, default: '' },
+    comentario: { type: String, default: '' },
+    pagadaAutomaticamente: { type: Boolean, default: false },
+    numeroDeOperacion: { type: String, default: '' },
+    tipoDocReferencia: { type: Number, default: 0 }
+
 });
 
+
+modeloBDFacturas.plugin(mongoosePaginate);
 module.exports = mongoose.model('Facturas', modeloBDFacturas);

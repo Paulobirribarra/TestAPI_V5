@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>Configuración - FacturasApp</title>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main class="container">
+        <h1>Configuración</h1>
+        <form id="config-form">
+            <label for="apiUser">Usuario API:</label>
+            <input type="text" id="apiUser" name="apiUser" value="api" required readonly />
+
+            <label for="apiKey">API Key:</label>
+            <input type="password" id="apiKey" name="apiKey" placeholder="Ej: ABC123-xyz789" required />
+
+            <button type="submit">Guardar Configuración</button>
+        </form>
+
+        <div id="mensajeExito">
+            ✅ Configuración guardada con éxito
+        </div>
+        <div id="mensajeError">
+            ❌ Error al guardar la configuración
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('config-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const apiUser = document.getElementById('apiUser').value;
+            const apiKey = document.getElementById('apiKey').value;
+
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiUser, apiKey })
+                });
+
+                if (response.ok) {
+                    document.getElementById('mensajeExito').style.display = 'block';
+                    document.getElementById('mensajeError').style.display = 'none';
+                    document.getElementById('apiKey').value = '';
+                } else {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('mensajeExito').style.display = 'none';
+                document.getElementById('mensajeError').style.display = 'block';
+            }
+        });
+    </script>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

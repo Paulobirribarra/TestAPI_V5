@@ -1,37 +1,49 @@
+<!-- views/index.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listado de Facturas</title>
-    <link rel="stylesheet" href="/css/styles.css"> <!-- Agrega tu hoja de estilos -->
+    <%- include('partials/head') %>
 </head>
 <body>
     <%- include('partials/header') %>
-    
+
     <main class="container">
         <h1>Listado de Facturas</h1>
-        
+
         <section class="facturas">
+            <a href="/notasDeCredito">Ver Notas de Crédito</a>
+
             <% if (facturas.length > 0) { %>
                 <div class="factura-grid">
                     <% facturas.forEach(factura => { %>
-                        <div class="factura-card">
-                            <h2>Folio: <%= factura.folio %></h2>
-                            <p><strong>Razón Social:</strong> <%= factura.razonSocial %></p>
-                            <p><strong>RUT Cliente:</strong> <%= factura.rutCliente %></p>
-                            <p><strong>Fecha Emisión:</strong> <%= factura.fechaEmision.toDateString() %></p>
-                            <p><strong>Monto Total:</strong> $<%= factura.montoTotal.toLocaleString() %></p>
-                            <p><strong>Estado:</strong> <%= factura.estado %></p>
-                        </div>
+                        <%- include('partials/card', { factura: factura }) %>
                     <% }) %>
                 </div>
+
+                <div class="pagination">
+                    <% if (hasPrevPage) { %>
+                        <a href="/?page=<%= currentPage - 1 %>" class="pagination-btn">Anterior</a>
+                    <% } else { %>
+                        <span class="pagination-btn disabled">Anterior</span>
+                    <% } %>
+
+                    <span>Página <%= currentPage %> de <%= totalPages %></span>
+
+                    <% if (hasNextPage) { %>
+                        <a href="/?page=<%= currentPage + 1 %>" class="pagination-btn">Siguiente</a>
+                    <% } else { %>
+                        <span class="pagination-btn disabled">Siguiente</span>
+                    <% } %>
+                </div>
             <% } else { %>
-                <p>No hay facturas disponibles.</p>
+                <p>No hay facturas disponibles. <a href="/consulta">Consulta facturas</a> para agregar nuevas.</p>
             <% } %>
         </section>
     </main>
-    
+
     <%- include('partials/footer') %>
 </body>
 </html>

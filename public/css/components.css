@@ -1,0 +1,192 @@
+/* Botones */
+button {
+    margin-top: 5px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.pagination-btn {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-btn:hover:not(.disabled) {
+    background-color: #0056b3;
+}
+
+.pagination-btn.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Formulario de Consulta */
+#consulta-form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 20px auto;
+}
+
+#consulta-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+#consulta-form select,
+#consulta-form input[type="date"],
+#consulta-form input[type="month"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+#consulta-form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #007bff;
+    transition: background-color 0.3s ease;
+}
+
+#consulta-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Mensajes y Loading */
+#mensajeExito {
+    background-color: #28a745;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
+    text-align: center;
+    border-radius: 5px;
+    display: none;
+}
+
+#mensajeError {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
+    text-align: center;
+    border-radius: 5px;
+    display: none;
+}
+
+#loadingIcon {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#loadingIcon img {
+    width: 50px;
+    height: 50px;
+}
+
+/* Formulario de Configuración */
+#config-form {
+    background: linear-gradient(135deg, #667eea, #764ba2); /* Gradiente azul claro */
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.2);
+    max-width: 450px;
+    margin: 30px auto;
+    border: 1px solid #cce0ff;
+}
+
+#config-form {
+    animation: fadeIn 0.5s ease-in;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#config-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #004085;
+    font-size: 16px;
+}
+
+#config-form input[type="text"],
+#config-form input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #b3d7ff;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#config-form input[type="text"]:hover,
+#config-form input[type="password"]:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+#config-form input#apiUser {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
+#config-form input#apiKey {
+    font-family: monospace;
+}
+
+#config-form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#config-form button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
