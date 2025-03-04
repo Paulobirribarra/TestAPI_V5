@@ -21,7 +21,7 @@ connectDB();
 
 // Configuración de sesiones
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'mi_secreto_super_seguro',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
 }));

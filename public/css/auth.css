@@ -71,3 +71,19 @@
     font-size: 14px;
     margin-bottom: 15px;
 }
+
+.register-link {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #28a745; /* Verde para destacar */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.register-link:hover {
+    background-color: #218838; /* Verde más oscuro */
+    text-decoration: none;
+}

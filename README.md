@@ -65,24 +65,60 @@ http://localhost:3000
 ---
 ### Estructura del proyecto
 ```bash 
-TestAPI_V5/
-├── app.js               # Archivo principal del servidor
-├── package.json         # Dependencias y configuraciones
-├── .env                 # Variables de entorno
-├── config/
-│   ├── BDConection.js   # Configuración de la base de datos
-├── models/
-│   ├── Facturas.js      # Esquema de MongoDB para facturas
-├── routes/
-│   ├── api.js          # Rutas relacionadas con la API
-│   ├── index.js        # Rutas principales
-│   ├── notasDeCredito.js # Rutas para notas de crédito
-├── views/
-│   ├── index.ejs       # Plantilla principal
-│   ├── partials/       # Fragmentos reutilizables de EJS
-├── public/
-│   ├── css/            # Archivos de estilos
-│   ├── images/         # Imágenes y otros recursos estáticos
+└── paulobirribarra-testapi_v5/
+    ├── README.md
+    ├── app.js
+    ├── docker-compose.yml          # Nuevo archivo para Docker
+    ├── Dockerfile                  # Opcional, si decides incluirlo ahora
+    ├── package.json
+    ├── config/
+    │   ├── BDConection.js         # Sin cambios
+    │   ├── database.js            # Sin cambios
+    │   ├── Passport.js            # Sin cambios
+    │   ├── procesarFacturas.js    # Sin cambios
+    │   └── server.js              # Sin cambios
+    ├── controllers/
+    │   ├── apiController.js       # Sin cambios
+    │   ├── configController.js    # Sin cambios
+    │   ├── indexController.js     # Sin cambios
+    │   └── notasDeCreditoController.js # Sin cambios
+    ├── middleware/
+    │   ├── auth.js                # Sin cambios
+    │   └── errorHandler.js        # Sin cambios
+    ├── models/
+    │   ├── Config.js              # Sin cambios
+    │   ├── Facturas.js            # Sin cambios
+    │   └── User.js                # Nuevo: modelo de usuarios
+    ├── public/
+    │   └── css/
+    │       ├── auth.css           # Nuevo: estilos para login/register
+    │       ├── base.css           # Sin cambios
+    │       ├── cards.css          # Sin cambios
+    │       ├── components.css     # Sin cambios
+    │       ├── header-footer.css  # Sin cambios
+    │       └── styles.css         # Sin cambios
+    ├── routes/
+    │   ├── api.js                 # Sin cambios
+    │   ├── auth.js                # Nuevo: rutas de autenticación
+    │   ├── config.js              # Sin cambios
+    │   ├── index.js               # Sin cambios
+    │   └── notasDeCredito.js      # Sin cambios
+    ├── services/
+    │   ├── apiService.js          # Sin cambios
+    │   └── invoiceService.js      # Sin cambios
+    └── views/
+        ├── Configuracion.ejs      # Sin cambios
+        ├── consultarFacturas.ejs  # Sin cambios
+        ├── index.ejs              # Sin cambios
+        ├── notasDeCredito.ejs     # Sin cambios
+        ├── auth/                  # Nueva subcarpeta
+        │   ├── login.ejs          # Nuevo: vista de login
+        │   └── register.ejs       # Nuevo: vista de registro
+        └── partials/
+            ├── card.ejs           # Sin cambios
+            ├── footer.ejs         # Sin cambios
+            ├── head.ejs           # Sin cambios
+            └── header.ejs         # Sin cambios
 ```
 
 ---

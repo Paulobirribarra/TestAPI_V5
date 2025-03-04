@@ -9,8 +9,11 @@
     <%- include('../partials/header') %>
     <main class="auth-container">
         <h1>Registrar Nuevo Usuario</h1>
+        <% if (isFirstUser) { %>
+            <p style="color: green;">Este será el primer usuario y se registrará como administrador.</p>
+        <% } %>
         <% if (error) { %>
-            <p style="color: red;"><%= error %></p>
+            <p class="error"><%= error %></p>
         <% } %>
         <form action="/auth/register" method="POST">
             <label for="username">Usuario:</label>
@@ -20,14 +23,19 @@
             <input type="password" id="password" name="password" required />
 
             <label for="role">Rol:</label>
-            <select id="role" name="role">
-                <option value="lector">Lector</option>
-                <option value="admin">Admin</option>
+            <select id="role" name="role" <% if (isFirstUser) { %> disabled <% } %>>
+                <option value="lector" <% if (!isFirstUser) { %> selected <% } %>>Lector</option>
+                <option value="admin" <% if (isFirstUser) { %> selected <% } %>>Admin</option>
             </select>
+            <% if (isFirstUser) { %>
+                <input type="hidden" name="role" value="admin">
+            <% } %>
 
             <button type="submit">Registrar</button>
         </form>
-        <a href="/">Volver al inicio</a>
+        <% if (!isFirstUser) { %>
+            <p><a href="/">Volver al inicio</a></p>
+        <% } %>
     </main>
     <%- include('../partials/footer') %>
 </body>
