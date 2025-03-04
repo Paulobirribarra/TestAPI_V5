@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/css/auth.css">
+    <title>Registrar Usuario</title>
+</head>
+<body>
+    <%- include('../partials/header') %>
+    <main class="auth-container">
+        <h1>Registrar Nuevo Usuario</h1>
+        <% if (error) { %>
+            <p style="color: red;"><%= error %></p>
+        <% } %>
+        <form action="/auth/register" method="POST">
+            <label for="username">Usuario:</label>
+            <input type="text" id="username" name="username" required />
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required />
+
+            <label for="role">Rol:</label>
+            <select id="role" name="role">
+                <option value="lector">Lector</option>
+                <option value="admin">Admin</option>
+            </select>
+
+            <button type="submit">Registrar</button>
+        </form>
+        <a href="/">Volver al inicio</a>
+    </main>
+    <%- include('../partials/footer') %>
+</body>
+</html>

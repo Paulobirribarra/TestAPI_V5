@@ -1,7 +1,7 @@
 {
   "name": "testapi_v6",
   "version": "1.0.0",
-  "description": "",
+  "description": "Este proyecto es una aplicación para gestionar facturas y notas de crédito. La aplicación consulta datos desde una API externa, los almacena en una base de datos MongoDB y permite a los usuarios visualizar y editar información relacionada con las facturas.",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon app.js"
@@ -19,12 +19,21 @@
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "helmet": "^8.0.0",
-    "mongoose": "^8.11.0",
+    "mongoose": "^8.12.0",
     "mongoose-paginate-v2": "^1.9.0",
     "morgan": "^1.10.0",
-    "passport": "^0.7.0"
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Paulobirribarra/TestAPI_V5.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Paulobirribarra/TestAPI_V5/issues"
+  },
+  "homepage": "https://github.com/Paulobirribarra/TestAPI_V5#readme"
 }
