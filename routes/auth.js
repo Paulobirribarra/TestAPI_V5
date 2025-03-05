@@ -72,11 +72,25 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Logout
-router.get('/logout', (req, res) => {
+// routes/auth.js
+router.get('/logout', (req, res, next) => {
     req.logout((err) => {
-        if (err) return next(err);
-        res.redirect('/auth/login');
+        if (err) {
+            console.error('🚨 Error al cerrar sesión:', err);
+            return next(err);
+        }
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('🚨 Error al destruir la sesión:', err);
+                return res.status(500).send('Error al cerrar sesión');
+            }
+            res.clearCookie('connect.sid');
+            res.clearCookie('session');
+            res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+            res.set('Pragma', 'no-cache');
+            res.set('Expires', '0');
+            res.redirect('/auth/login');
+        });
     });
 });
 

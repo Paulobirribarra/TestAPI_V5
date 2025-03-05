@@ -32,14 +32,14 @@ passport.use(new LocalStrategy(
 ));
 
 passport.serializeUser((user, done) => {
-    console.log('📦 Serializando usuario:', user.username);
+    //console.log('📦 Serializando usuario:', user.username);
     done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
     try {
         const user = await User.findById(id);
-        console.log('📥 Deserializando usuario:', user ? user.username : 'No encontrado');
+        //console.log('📥 Deserializando usuario:', user ? user.username : 'No encontrado');
         done(null, user);
     } catch (error) {
         console.log('🚨 Error en deserialización:', error);

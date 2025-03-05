@@ -3,17 +3,35 @@
     <h2>Folio: <%= factura.folio %></h2>
     <p><strong>Razón Social:</strong> <%= factura.razonSocial %></p>
     <p><strong>RUT Cliente:</strong> <%= factura.rutCliente %></p>
-    <p><strong>Fecha Emisión:</strong> <%= factura.fechaEmision.toDateString() %></p>
+    <p><strong>Fecha Emisión:</strong> <%= factura.fechaEmision.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
     <p><strong>Monto Total:</strong> $<%= factura.montoTotal.toLocaleString() %></p>
     <p><strong>Estado:</strong> <%= factura.estado %></p>
+    <p><strong>Método de Pago:</strong> <%= factura.metodoDePago || 'No especificado' %></p>
+    <p><strong>Comentario:</strong> <%= factura.comentario || 'Sin comentarios' %></p>
+    <p><strong>Fecha de Pago:</strong> <%= factura.fechaDePago ? factura.fechaDePago.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : 'No registrada' %></p>
 
-    <!-- Detalles adicionales (opcional) -->
-    <div class="detalles" id="detalles-<%= factura.folio %>" style="display:none;">
-        <p><strong>Pagada:</strong> <%= factura.pagada ? 'Sí' : 'No' %></p>
-        <p><strong>Método de Pago:</strong> <%= factura.metodoDePago || 'No especificado' %></p>
-    </div>
-
-    <button onclick="toggleDetalles('<%= factura.folio %>')">Ver más</button>
+    <% if (user && user.role === 'admin') { %>
+        <button onclick="toggleDetalles('<%= factura.folio %>')">Editar</button>
+        <div class="detalles" id="detalles-<%= factura.folio %>">
+            <form action="/factura/update/<%= factura._id %>" method="POST">
+                <label><strong>Pagada:</strong>
+                    <input type="checkbox" name="pagada" <%= factura.pagada ? 'checked' : '' %>>
+                </label>
+                <label><strong>Método de Pago:</strong>
+                    <input type="text" name="metodoDePago" value="<%= factura.metodoDePago || '' %>">
+                </label>
+                <label><strong>Comentario:</strong>
+                    <input type="text" name="comentario" value="<%= factura.comentario || '' %>" placeholder="Ej: Pagado por transferencia">
+                </label>
+                <label><strong>Fecha de Pago:</strong>
+                    <input type="date" name="fechaDePago" value="<%= factura.fechaDePago ? factura.fechaDePago.toISOString().split('T')[0] : '' %>">
+                </label>
+                <div class="button-container">
+                    <button type="submit">Guardar</button>
+                </div>
+            </form>
+        </div>
+    <% } %>
 </div>
 
 <script>

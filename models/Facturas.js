@@ -23,7 +23,10 @@ const modeloBDFacturas = new mongoose.Schema({
     comentario: { type: String, default: '' },
     pagadaAutomaticamente: { type: Boolean, default: false },
     numeroDeOperacion: { type: String, default: '' },
-    tipoDocReferencia: { type: Number, default: 0 }
+    tipoDocReferencia: { type: Number, default: 0 },
+    fechaDePago: { type: Date, default: null }, // Nuevo campo
+    fechaModificacion: { type: Date, default: null }, // Oculto, para referencia
+    modificadoPor: { type: String, default: null } // Oculto, guarda el username
 
 });
 

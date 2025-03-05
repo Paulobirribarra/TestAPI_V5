@@ -190,3 +190,32 @@ button:hover {
     background-color: #0056b3;
     transform: translateY(-2px);
 }
+
+.filter-form {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.filter-form label {
+    font-weight: bold;
+    color: #333;
+}
+
+.filter-form input[type="number"],
+.filter-form select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filter-form button {
+    padding: 8px 15px;
+    font-size: 14px;
+}

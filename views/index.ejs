@@ -2,16 +2,29 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listado de Facturas</title>
     <%- include('partials/head') %>
+    <title>Listado de Facturas</title>
 </head>
 <body>
     <%- include('partials/header') %>
 
     <main class="container">
         <h1>Listado de Facturas</h1>
+
+        <!-- Formulario de filtros -->
+        <form method="GET" action="/" class="filter-form">
+            <label for="folio">Folio:</label>
+            <input type="number" id="folio" name="folio" value="<%= filtroFolio %>" />
+
+            <label for="estado">Estado:</label>
+            <select id="estado" name="estado">
+                <option value="" <%= !filtroEstado ? 'selected' : '' %>>Todos</option>
+                <option value="pagada" <%= filtroEstado === 'pagada' ? 'selected' : '' %>>Pagada</option>
+                <option value="pendiente" <%= filtroEstado === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
+            </select>
+
+            <button type="submit">Filtrar</button>
+        </form>
 
         <section class="facturas">
             <a href="/notasDeCredito">Ver Notas de Crédito</a>
@@ -24,18 +37,22 @@
                 </div>
 
                 <div class="pagination">
-                    <% if (hasPrevPage) { %>
-                        <a href="/?page=<%= currentPage - 1 %>" class="pagination-btn">Anterior</a>
+                    <% if (currentPage > 1) { %>
+                        <a href="/?page=1&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>" class="pagination-btn">Primera</a>
+                        <a href="/?page=<%= currentPage - 1 %>&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>" class="pagination-btn">Anterior</a>
                     <% } else { %>
+                        <span class="pagination-btn disabled">Primera</span>
                         <span class="pagination-btn disabled">Anterior</span>
                     <% } %>
-
+                
                     <span>Página <%= currentPage %> de <%= totalPages %></span>
-
-                    <% if (hasNextPage) { %>
-                        <a href="/?page=<%= currentPage + 1 %>" class="pagination-btn">Siguiente</a>
-                    <% } else { %>
+                
+                    <% if (currentPage < totalPages) { %>
+                        <a href="/?page=<%= currentPage + 1 %>&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>" class="pagination-btn">Siguiente</a>
+                        <a href="/?page=<%= totalPages %>&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>" class="pagination-btn">Última</a>
+                    <% } else if (totalPages > 1) { %>
                         <span class="pagination-btn disabled">Siguiente</span>
+                        <span class="pagination-btn disabled">Última</span>
                     <% } %>
                 </div>
             <% } else { %>
