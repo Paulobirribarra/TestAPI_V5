@@ -30,9 +30,7 @@
         </form>
 
         <section class="facturas">
-            <a href="/notasDeCredito">Ver Notas de Crédito</a>
-
-            <% if (facturas.length > 0) { %>
+                <% if (facturas.length > 0) { %>
                 <div class="factura-grid">
                     <% facturas.forEach(factura => { %>
                         <%- include('partials/card', { factura: factura }) %>

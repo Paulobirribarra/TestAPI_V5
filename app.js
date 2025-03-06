@@ -12,10 +12,8 @@ const apiRoutes = require('./routes/api');
 const indexRoutes = require('./routes/index');
 const notasDeCreditoRoutes = require('./routes/notasDeCredito');
 const configRoutes = require('./routes/config');
-
-//Auth
 const authRoutes = require('./routes/auth');
-
+const resumenMensualRoutes = require('./routes/resumenMensual');
 // Conectar a la base de datos
 connectDB();
 
@@ -62,10 +60,8 @@ app.use('/', indexRoutes);
 app.use('/notasDeCredito', notasDeCreditoRoutes);
 app.use('/configuracion', configRoutes);
 app.use('/auth', authRoutes);
+app.use('/resumenMensual', resumenMensualRoutes);
 app.use(require('./middleware/errorHandler'));
-
-// Ruta específica para consulta
-//app.get('/consulta', (req, res) => res.render('consultarFacturas'));
 
 // Iniciar servidor
 app.listen(PORT, () => {

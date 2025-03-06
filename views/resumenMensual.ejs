@@ -1,0 +1,34 @@
+<!-- views/resumenMensual.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>Resumen Mensual - FacturasApp</title>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main class="container">
+        <h1>Resumen Mensual de Facturas</h1>
+        <section class="resumen-mensual">
+            <% if (resumenes && resumenes.length > 0) { %>
+                <div class="resumen-grid">
+                    <% resumenes.forEach(resumen => { %>
+                        <div class="resumen-card">
+                            <h2>Periodo: <%= resumen.periodoFormateado %></h2>
+                            <p><strong>Total Facturas:</strong> $<%= resumen.totalFacturas.toLocaleString() %></p>
+                            <p><strong>Total Notas de Crédito:</strong> $<%= resumen.totalNotasCredito.toLocaleString() %></p>
+                            <p><strong>Monto Neto:</strong> $<%= resumen.montoNeto.toLocaleString() %></p>
+                            <p><strong>Última Actualización:</strong> <%= resumen.ultimaActualizacionFormateada %></p>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p>No hay resúmenes mensuales disponibles. <a href="/api/consulta">Consulta facturas</a> para agregar datos.</p>
+            <% } %>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

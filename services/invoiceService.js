@@ -1,5 +1,6 @@
 // services/invoiceService.js
 const Facturas = require('../models/Facturas');
+const ResumenMensual = require('../models/ResumenMensual'); // Importación añadida
 
 const saveInvoices = async (facturas) => {
     if (!facturas || facturas.length === 0) {
@@ -37,6 +38,42 @@ const saveInvoices = async (facturas) => {
     }
 };
 
+const updateResumenMensual = async () => {
+    try {
+        // Obtener todos los periodos únicos de las facturas
+        const periodos = await Facturas.distinct('periodo');
+
+        for (const periodo of periodos) {
+            // Filtrar facturas (tipo 33) y notas de crédito (tipo 61) por periodo
+            const facturasMes = await Facturas.find({ tipoDTENumber: 33, periodo });
+            const notasCreditoMes = await Facturas.find({ tipoDTENumber: 61, periodo });
+
+            // Calcular totales
+            const totalFacturasMes = facturasMes.reduce((sum, f) => sum + f.montoTotal, 0);
+            const totalNotasCreditoMes = notasCreditoMes.reduce((sum, f) => sum + f.montoTotal, 0);
+            const montoNetoMes = totalFacturasMes - totalNotasCreditoMes;
+
+            // Actualizar o crear el registro en ResumenMensual
+            await ResumenMensual.updateOne(
+                { periodo },
+                {
+                    $set: {
+                        totalFacturas: totalFacturasMes,
+                        totalNotasCredito: totalNotasCreditoMes,
+                        montoNeto: montoNetoMes,
+                        fechaActualizacion: new Date()
+                    }
+                },
+                { upsert: true } // Si no existe, lo crea
+            );
+        }
+        console.log('✅ ResumenMensual actualizado correctamente para todos los periodos');
+    } catch (error) {
+        console.error('❌ Error al actualizar ResumenMensual:', error.message);
+        throw error;
+    }
+};
+
 const updatePaidInvoices = async () => {
     const facturas = await Facturas.find({ tipoDocReferencia: 48, pagada: false });
     for (const factura of facturas) {
@@ -54,4 +91,4 @@ const updatePaidInvoices = async () => {
     return facturas.length;
 };
 
-module.exports = { saveInvoices, updatePaidInvoices };
+module.exports = { saveInvoices, updateResumenMensual, updatePaidInvoices };

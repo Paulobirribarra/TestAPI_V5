@@ -11,6 +11,7 @@ const getInvoices = async (req, res) => {
 
         const facturas = await apiService.fetchInvoices({ fecha, mes, anio }, config);
         await invoiceService.saveInvoices(facturas);
+        await invoiceService.updateResumenMensual(); // Llamada para actualizar el resumen mensual
 
         res.json({ consultaRealizada: true, facturas });
     } catch (error) {
