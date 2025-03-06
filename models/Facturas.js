@@ -24,12 +24,15 @@ const modeloBDFacturas = new mongoose.Schema({
     pagadaAutomaticamente: { type: Boolean, default: false },
     numeroDeOperacion: { type: String, default: '' },
     tipoDocReferencia: { type: Number, default: 0 },
-    fechaDePago: { type: Date, default: null }, // Nuevo campo
-    fechaModificacion: { type: Date, default: null }, // Oculto, para referencia
-    modificadoPor: { type: String, default: null } // Oculto, guarda el username
-
+    fechaDePago: { type: Date, default: null },
+    fechaModificacion: { type: Date, default: null },
+    modificadoPor: { type: String, default: null },
+    // Nuevos campos
+    fechaVencimiento: { type: Date, default: null }, // Calculada como fechaEmision + 30 días
+    contacto: { type: String, default: '' }, // Nombre del contacto, ej: "Angelica Valenzuela"
+    correoContacto: { type: String, default: '' }, // Correo del contacto
+    sector: { type: String, default: '' } // Sector del contacto
 });
-
 
 modeloBDFacturas.plugin(mongoosePaginate);
 module.exports = mongoose.model('Facturas', modeloBDFacturas);

@@ -2,24 +2,31 @@
 <html lang="es">
 <head>
     <%- include('partials/head') %>
-    <title>Consultar Facturas</title>
 </head>
 <body>
     <%- include('partials/header') %>
 
-    <main class="container">
+    <main>
         <h1>Consultar Facturas</h1>
 
         <form id="consulta-form">
             <label for="tipoConsulta">Tipo de Consulta:</label>
             <select id="tipoConsulta">
                 <option value="dia">Por Día</option>
+                <option value="rango">Por Rango de Días</option>
                 <option value="mes">Por Mes</option>
             </select>
 
             <div id="fecha-container">
                 <label for="fecha">Selecciona una Fecha:</label>
                 <input type="date" id="fecha" />
+            </div>
+
+            <div id="rango-container" style="display: none;">
+                <label for="fechaInicio">Fecha Inicio:</label>
+                <input type="date" id="fechaInicio" />
+                <label for="fechaFin">Fecha Fin:</label>
+                <input type="date" id="fechaFin" />
             </div>
 
             <div id="mes-container" style="display: none;">
@@ -31,30 +38,33 @@
         </form>
 
         <div id="loadingIcon">
-            <img src="/img/loading-icon.gif" alt="Cargando..." />
+            <div class="spinner"></div>
+            <p>Procesando consulta...</p>
+            <div id="progressBarContainer">
+                <div id="progressBar"></div>
+            </div>
         </div>
 
-        <div id="mensajeExito">
-            ✅ Consulta realizada con éxito.
-        </div>
+        <div id="mensajeExito" style="display: none;">✅ Consulta realizada con éxito.</div>
+        <div id="mensajeError" style="display: none;">❌ Error en la consulta. Inténtalo de nuevo.</div>
+        <section class="facturas" id="resultado"></section>
 
-        <div id="mensajeError">
-            ❌ Error en la consulta. Inténtalo de nuevo.
+        <div id="consultasRestantes" style="margin-top: 20px; font-size: 14px; color: #333;">
+            Consultas restantes: <span id="contadorConsultas">Cargando...</span>
         </div>
-
-        <section class="facturas" id="resultado">
-            <!-- Aquí se mostrarán las facturas dinámicamente -->
-        </section>
     </main>
+
+    <%- include('partials/footer') %>
 
     <script>
         document.getElementById('tipoConsulta').addEventListener('change', function () {
             const tipo = this.value;
             document.getElementById('fecha-container').style.display = tipo === 'dia' ? 'block' : 'none';
+            document.getElementById('rango-container').style.display = tipo === 'rango' ? 'block' : 'none';
             document.getElementById('mes-container').style.display = tipo === 'mes' ? 'block' : 'none';
         });
 
-        async function fetchConTimeout(url, timeout = 120000) {
+        async function fetchConTimeout(url, timeout = 30000) {
             const controlador = new AbortController();
             const id = setTimeout(() => controlador.abort(), timeout);
             try {
@@ -77,6 +87,15 @@
             document.getElementById('mensajeExito').style.display = 'none';
             document.getElementById('mensajeError').style.display = 'none';
             document.getElementById('resultado').innerHTML = '';
+            document.getElementById('progressBar').style.width = '0'; // Reiniciar barra
+
+            let progress = 0;
+            const timeout = 30000; // 30 segundos
+            const progressInterval = setInterval(() => {
+                progress += (100 / (timeout / 1000)); // Incremento por segundo
+                if (progress > 100) progress = 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }, 1000);
 
             try {
                 if (tipo === 'dia') {
@@ -86,6 +105,14 @@
                         return;
                     }
                     url += `?fecha=${fecha}`;
+                } else if (tipo === 'rango') {
+                    const fechaInicio = document.getElementById('fechaInicio').value;
+                    const fechaFin = document.getElementById('fechaFin').value;
+                    if (!fechaInicio || !fechaFin) {
+                        alert("Por favor, selecciona un rango de fechas.");
+                        return;
+                    }
+                    url += `?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
                 } else {
                     const mes = document.getElementById('mes').value;
                     if (!mes) {
@@ -96,9 +123,9 @@
                     url += `?mes=${mesNum}&anio=${anio}`;
                 }
 
-                console.log('📋 URL generada para la consulta:', url); // Línea añadida para depuración
+                console.log('📋 URL generada para la consulta:', url);
 
-                const response = await fetchConTimeout(url, 20000);
+                const response = await fetchConTimeout(url, timeout);
                 const data = await response.json();
 
                 console.log("✅ Respuesta JSON recibida:", data);
@@ -118,6 +145,12 @@
                     `).join('');
 
                     document.getElementById('resultado').innerHTML = `<div class="factura-grid">${facturasHTML}</div>`;
+
+                    // Actualizar consultas restantes si está disponible en la respuesta
+                    if (data.consultasRestantes !== undefined) {
+                        localStorage.setItem('consultasRestantes', data.consultasRestantes);
+                        document.getElementById('contadorConsultas').textContent = data.consultasRestantes;
+                    }
                 } else {
                     throw new Error(data.error || "No se encontraron facturas.");
                 }
@@ -126,11 +159,23 @@
                 document.getElementById('mensajeError').style.display = 'block';
                 document.getElementById('resultado').innerHTML = `<p style="color: red;">${error.message}</p>`;
             } finally {
-                document.getElementById('loadingIcon').style.display = 'none';
+                clearInterval(progressInterval); // Detener el intervalo
+                document.getElementById('progressBar').style.width = '100%'; // Completar la barra
+                setTimeout(() => {
+                    document.getElementById('loadingIcon').style.display = 'none';
+                }, 500); // Ocultar después de un pequeño retraso
+            }
+        });
+
+        // Cargar el número de consultas restantes al iniciar la página
+        window.addEventListener('load', () => {
+            const consultasRestantes = localStorage.getItem('consultasRestantes');
+            if (consultasRestantes) {
+                document.getElementById('contadorConsultas').textContent = consultasRestantes;
+            } else {
+                document.getElementById('contadorConsultas').textContent = 'Desconocido';
             }
         });
     </script>
-
-    <%- include('partials/footer') %>
 </body>
 </html>

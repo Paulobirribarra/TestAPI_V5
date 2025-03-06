@@ -1,42 +1,78 @@
 <!-- views/partials/card.ejs -->
-<div class="factura-card <%= factura.pagada ? 'pagada' : '' %>">
+<div class="factura-card <%= factura.pagada ? 'pagada' : '' %> <%= factura.vencida ? 'vencida' : '' %>">
     <h2>Folio: <%= factura.folio %></h2>
     <p><strong>Razón Social:</strong> <%= factura.razonSocial %></p>
     <p><strong>RUT Cliente:</strong> <%= factura.rutCliente %></p>
     <p><strong>Fecha Emisión:</strong> <%= factura.fechaEmision.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
+    <p><strong>Fecha Vencimiento:</strong> <%= factura.fechaVencimiento ? factura.fechaVencimiento.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : 'No disponible' %></p>
     <p><strong>Monto Total:</strong> $<%= factura.montoTotal.toLocaleString() %></p>
     <p><strong>Estado:</strong> <%= factura.estado %></p>
-    <p><strong>Método de Pago:</strong> <%= factura.metodoDePago || 'No especificado' %></p>
-    <p><strong>Comentario:</strong> <%= factura.comentario || 'Sin comentarios' %></p>
-    <p><strong>Fecha de Pago:</strong> <%= factura.fechaDePago ? factura.fechaDePago.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : 'No registrada' %></p>
 
     <% if (user && user.role === 'admin') { %>
-        <button onclick="toggleDetalles('<%= factura.folio %>')">Editar</button>
-        <div class="detalles" id="detalles-<%= factura.folio %>">
-            <form action="/factura/update/<%= factura._id %>" method="POST">
-                <label><strong>Pagada:</strong>
-                    <input type="checkbox" name="pagada" <%= factura.pagada ? 'checked' : '' %>>
-                </label>
-                <label><strong>Método de Pago:</strong>
-                    <input type="text" name="metodoDePago" value="<%= factura.metodoDePago || '' %>">
-                </label>
-                <label><strong>Comentario:</strong>
-                    <input type="text" name="comentario" value="<%= factura.comentario || '' %>" placeholder="Ej: Pagado por transferencia">
-                </label>
-                <label><strong>Fecha de Pago:</strong>
-                    <input type="date" name="fechaDePago" value="<%= factura.fechaDePago ? factura.fechaDePago.toISOString().split('T')[0] : '' %>">
-                </label>
-                <div class="button-container">
-                    <button type="submit">Guardar</button>
-                </div>
-            </form>
-        </div>
+        <button class="btn-ver-mas" onclick="openModal('<%= factura._id %>')">Ver más</button>
     <% } %>
 </div>
 
+<!-- Modal -->
+<div id="modal-<%= factura._id %>" class="modal">
+    <div class="modal-content">
+        <h2>Detalles de Factura - Folio <%= factura.folio %></h2>
+        <form action="/factura/update/<%= factura._id %>" method="POST" class="form-group">
+            <div class="form-group">
+                <label><strong>Estado de Pago:</strong></label>
+                <label class="switch">
+                    <input type="checkbox" name="pagada" <%= factura.pagada ? 'checked' : '' %>>
+                    <span class="slider"></span>
+                </label>
+                <span class="status-text"><%= factura.pagada ? 'Pagada' : 'Pendiente' %></span>
+            </div>
+            <div class="form-group">
+                <label><strong>Método de Pago:</strong></label>
+                <input type="text" name="metodoDePago" value="<%= factura.metodoDePago || '' %>" class="form-control">
+            </div>
+            <div class="form-group">
+                <label><strong>Comentario:</strong></label>
+                <input type="text" name="comentario" value="<%= factura.comentario || '' %>" class="form-control">
+            </div>
+            <div class="form-group">
+                <label><strong>Fecha de Pago:</strong></label>
+                <input type="date" name="fechaDePago" value="<%= factura.fechaDePago ? factura.fechaDePago.toISOString().split('T')[0] : '' %>" class="form-control">
+            </div>
+            <div class="form-group">
+                <label><strong>Contacto:</strong></label>
+                <input type="text" name="contacto" value="<%= factura.contacto || '' %>" class="form-control">
+            </div>
+            <div class="form-group">
+                <label><strong>Correo:</strong></label>
+                <input type="email" name="correoContacto" value="<%= factura.correoContacto || '' %>" class="form-control">
+            </div>
+            <div class="form-group">
+                <label><strong>Sector:</strong></label>
+                <input type="text" name="sector" value="<%= factura.sector || '' %>" class="form-control">
+            </div>
+            <div class="btn-group">
+                <button type="submit" class="btn-guardar">Guardar</button>
+                <button type="button" class="btn-cerrar" onclick="closeModal('<%= factura._id %>')">Cerrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-    function toggleDetalles(folio) {
-        const detalles = document.getElementById('detalles-' + folio);
-        detalles.classList.toggle('visible');
+    function openModal(id) {
+        const modal = document.getElementById(`modal-${id}`);
+        modal.style.display = 'flex';
     }
+
+    function closeModal(id) {
+        const modal = document.getElementById(`modal-${id}`);
+        modal.style.display = 'none';
+    }
+
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function(event) {
+        if (event.target.className === 'modal') {
+            event.target.style.display = 'none';
+        }
+    };
 </script>

@@ -9,7 +9,7 @@ router.get('/', isAuthenticated, indexController.getHomePage);
 
 router.post('/factura/update/:id', isAuthenticated, isAdmin, async (req, res) => {
     const { id } = req.params;
-    const { pagada, metodoDePago, comentario, fechaDePago } = req.body;
+    const { pagada, metodoDePago, comentario, fechaDePago, contacto, correoContacto, sector } = req.body;
     try {
         await Facturas.updateOne(
             { _id: id },
@@ -17,10 +17,13 @@ router.post('/factura/update/:id', isAuthenticated, isAdmin, async (req, res) =>
                 pagada: pagada === 'on', 
                 metodoDePago: metodoDePago || '',
                 comentario: comentario || '',
-                fechaDePago: fechaDePago ? new Date(fechaDePago) : null, // Convertimos a Date
+                fechaDePago: fechaDePago ? new Date(fechaDePago) : null,
                 estado: pagada === 'on' ? 'Pagada' : 'Pendiente',
-                fechaModificacion: new Date(), // Actualizamos fecha de modificación
-                modificadoPor: req.user.username // Guardamos el usuario que modificó
+                fechaModificacion: new Date(),
+                modificadoPor: req.user.username,
+                contacto: contacto || '',
+                correoContacto: correoContacto || '',
+                sector: sector || ''
             }
         );
         res.redirect('/');
