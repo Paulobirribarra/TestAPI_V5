@@ -6,5 +6,6 @@ const { isAuthenticated, isAdmin } = require('../middleware/auth');
 
 router.get('/', isAuthenticated, isAdmin, configController.getConfigPage);
 router.post('/sii', isAuthenticated, isAdmin, configController.saveSiiConfig);
+router.post('/saveSiiConfig', isAuthenticated, isAdmin, configController.saveSiiConfig);
 
 module.exports = router;

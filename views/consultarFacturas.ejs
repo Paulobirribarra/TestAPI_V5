@@ -15,6 +15,15 @@
                 <p>Primero debes ingresar los datos del consultante del SII. No te preocupes, los datos serán almacenados y encriptados.</p>
                 <a href="/configuracion" class="btn">Ir a Configuración</a>
             </div>
+        <% } else if (!passwordSII || passwordSIIExpires <= Date.now()) { %>
+            <form id="password-form" action="/consulta" method="POST">
+                <label for="passwordSII">Contraseña SII:</label>
+                <input type="password" id="passwordSII" name="passwordSII" required />
+                <button type="submit" class="btn">Enviar</button>
+                <% if (error) { %>
+                    <p style="color: red;"><%= error %></p>
+                <% } %>
+            </form>
         <% } else { %>
             <form id="consulta-form">
                 <label for="tipoConsulta">Tipo de Consulta:</label>
@@ -36,7 +45,7 @@
                 <button type="submit" class="btn">Consultar</button>
             </form>
 
-            <div id="loadingIcon">
+            <div id="loadingIcon" style="display: none">
                 <div class="spinner"></div>
                 <p>Procesando consulta...</p>
                 <div id="progressBarContainer">
@@ -56,19 +65,24 @@
 
     <%- include('partials/footer') %>
 
-    <% if (configSiiExists) { %>
+    <% if (configSiiExists && passwordSII && passwordSIIExpires > Date.now()) { %>
     <script>
         document.getElementById("tipoConsulta").addEventListener("change", function () {
             const tipo = this.value;
             document.getElementById("fecha-container").style.display = tipo === "dia" ? "block" : "none";
             document.getElementById("mes-container").style.display = tipo === "mes" ? "block" : "none";
+            if (tipo === "dia") {
+                document.getElementById("mes").value = "";
+            } else {
+                document.getElementById("fecha").value = "";
+            }
         });
 
         async function fetchConTimeout(url, timeout = 30000) {
-            const controlador = new AbortController();
-            const id = setTimeout(() => controlador.abort(), timeout);
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
             try {
-                const response = await fetch(url, { signal: controlador.signal });
+                const response = await fetch(url, { signal: controller.signal });
                 clearTimeout(id);
                 return response;
             } catch (error) {
@@ -81,7 +95,33 @@
             event.preventDefault();
 
             const tipo = document.getElementById("tipoConsulta").value;
-            let url = "/api/consulta";
+            let url = "/api/consulta?";
+
+            const params = new URLSearchParams();
+            if (tipo === "dia") {
+                const fecha = document.getElementById("fecha").value;
+                if (!fecha) {
+                    alert("Por favor, selecciona una fecha.");
+                    return;
+                }
+                const [anio, mes, dia] = fecha.split("-");
+                params.append("fecha", fecha); // Enviar fecha completa para procesarla en el backend
+            } else if (tipo === "mes") {
+                const mes = document.getElementById("mes").value;
+                if (!mes) {
+                    alert("Por favor, selecciona un mes.");
+                    return;
+                }
+                const [anio, mesNum] = mes.split("-");
+                params.append("mes", mesNum);
+                params.append("anio", anio);
+            } else {
+                alert("Por favor, selecciona un tipo de consulta válido.");
+                return;
+            }
+
+            url += params.toString();
+            console.log("📋 URL generada para la consulta:", url);
 
             document.getElementById("loadingIcon").style.display = "block";
             document.getElementById("mensajeExito").style.display = "none";
@@ -98,25 +138,6 @@
             }, 1000);
 
             try {
-                if (tipo === "dia") {
-                    const fecha = document.getElementById("fecha").value;
-                    if (!fecha) {
-                        alert("Por favor, selecciona una fecha.");
-                        return;
-                    }
-                    url += `?fecha=${fecha}`;
-                } else {
-                    const mes = document.getElementById("mes").value;
-                    if (!mes) {
-                        alert("Por favor, selecciona un mes.");
-                        return;
-                    }
-                    const [anio, mesNum] = mes.split("-");
-                    url += `?mes=${mesNum}&anio=${anio}`;
-                }
-
-                console.log("📋 URL generada para la consulta:", url);
-
                 const response = await fetchConTimeout(url, timeout);
                 const data = await response.json();
 
@@ -124,7 +145,6 @@
 
                 if (response.ok && data.consultaRealizada && data.facturas.length > 0) {
                     document.getElementById("mensajeExito").style.display = "block";
-
                     if (data.saveResult.saved) {
                         document.getElementById("resultado").innerHTML = `
                             <div class="resultado-mensaje">

@@ -2,10 +2,10 @@
 const { app, PORT } = require('./config/server');
 const connectDB = require('./config/database');
 const express = require('express');
-//Auth
-const passport = require('./config/Passport');
 const session = require('express-session');
-const { isAuthenticated, isAdmin } = require('./middleware/auth');// Importar isAdmin
+const passport = require('./config/Passport');
+const { isAuthenticated, isAdmin } = require('./middleware/auth');
+const Config = require('./models/Config'); // Importar el modelo
 
 // Rutas
 const apiRoutes = require('./routes/api');
@@ -18,56 +18,60 @@ const resumenMensualRoutes = require('./routes/resumenMensual');
 // Conectar a la base de datos
 connectDB();
 
+(async () => {
+    try {
+        // Obtener o crear el documento de configuración
+        const config = await Config.findOne() || await new Config({ apiKey: 'default-key', apiUser: 'default-user' }).save();
+        const sessionSecret = config.sessionSecret;
 
-// Configuración de sesiones
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // Cambia a `true` si usas HTTPS en producción
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 24 horas
-        sameSite: 'strict' // Evita que la cookie se envíe en solicitudes cruzadas
+        // Configuración de sesiones
+        app.use(session({
+            secret: sessionSecret,
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                secure: false, // Cambia a `true` si usas HTTPS en producción
+                httpOnly: true,
+                maxAge: 24 * 60 * 60 * 1000, // 24 horas
+                sameSite: 'strict'
+            }
+        }));
+
+        app.use('/css', express.static('public/css'));
+        app.use(passport.initialize());
+        app.use(passport.session());
+
+        // Middleware global para evitar caché
+        app.use((req, res, next) => {
+            if (!req.isAuthenticated() && req.path !== '/auth/login' && !req.path.startsWith('/auth')) {
+                res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+                res.set('Pragma', 'no-cache');
+                res.set('Expires', '0');
+                return res.redirect('/auth/login');
+            }
+            next();
+        });
+
+        app.use((req, res, next) => {
+            res.locals.user = req.user || null;
+            next();
+        });
+
+        // Montar rutas
+        app.use('/api', apiRoutes);
+        app.use('/', indexRoutes);
+        app.use('/notasDeCredito', notasDeCreditoRoutes);
+        app.use('/configuracion', configRoutes);
+        app.use('/auth', authRoutes);
+        app.use('/resumenMensual', resumenMensualRoutes);
+        app.use(require('./middleware/errorHandler'));
+
+        // Iniciar servidor
+        app.listen(PORT, () => {
+            console.log(`Servidor corriendo en http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error('Error al iniciar la aplicación:', error);
+        process.exit(1);
     }
-}));
-
-app.use('/css', express.static('public/css'));
-
-// Inicializar Passport
-app.use(passport.initialize());
-app.use(passport.session());
-
-
-// Middleware global para evitar caché en páginas protegidas
-app.use((req, res, next) => {
-    if (!req.isAuthenticated() && req.path !== '/auth/login' && !req.path.startsWith('/auth')) {
-        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-        res.set('Pragma', 'no-cache');
-        res.set('Expires', '0');
-        return res.redirect('/auth/login');
-    }
-    next();
-});
-
-// Middleware para pasar el usuario a las vistas
-app.use((req, res, next) => {
-    res.locals.user = req.user || null;
-    next();
-});
-
-
-//=============================================================//
-// Montar rutas
-app.use('/api', apiRoutes);
-app.use('/', indexRoutes);
-app.use('/notasDeCredito', notasDeCreditoRoutes);
-app.use('/configuracion', configRoutes);
-app.use('/auth', authRoutes);
-app.use('/resumenMensual', resumenMensualRoutes);
-app.use(require('./middleware/errorHandler'));
-
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+})();

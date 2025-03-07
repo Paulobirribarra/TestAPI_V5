@@ -5,8 +5,7 @@ const ConfigUserSii = require('../models/configUserSii');
 
 const API_URL = process.env.API_URL || 'https://servicios.simpleapi.cl';
 
-const fetchInvoices = async ({ fecha, mes, anio }, config) => {
-    // Obtener datos del SII desde MongoDB
+const fetchInvoices = async ({ fecha, mes, anio }, config, passwordSII) => {
     const configSii = await ConfigUserSii.findOne();
     if (!configSii) {
         throw new Error('No se encontraron datos de configuración del SII');
@@ -34,7 +33,7 @@ const fetchInvoices = async ({ fecha, mes, anio }, config) => {
 
     const body = {
         RutUsuario: configSii.rutUsuario,
-        PasswordSII: configSii.passwordSII, // Ya está hasheada, pero la API espera la original; esto se ajustará más adelante si es necesario
+        PasswordSII: passwordSII, // Usar el valor plano de la sesión
         RutEmpresa: configSii.rutEmpresa,
         Ambiente: configSii.ambiente,
     };

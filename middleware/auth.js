@@ -1,4 +1,6 @@
 // middleware/auth.js
+const ConfigUserSii = require('../models/configUserSii');
+
 const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) return next();
     res.redirect('/auth/login');
@@ -6,7 +8,17 @@ const isAuthenticated = (req, res, next) => {
 
 const isAdmin = (req, res, next) => {
     if (req.isAuthenticated() && req.user.role === 'admin') return next();
-    res.status(403).send('Acceso denegado. Requiere permisos de administrador.');
+    res.status(403).json({ error: 'Acceso denegado: se requiere rol de administrador' });
 };
 
-module.exports = { isAuthenticated, isAdmin };
+const checkPasswordSII = async (req, res, next) => {
+    if (req.session.passwordSII && req.session.passwordSIIExpires > Date.now()) {
+        const configSii = await ConfigUserSii.findOne();
+        if (await configSii.comparePassword(req.session.passwordSII)) {
+            return next();
+        }
+    }
+    res.redirect('/consulta'); // Redirige para pedir el password
+};
+
+module.exports = { isAuthenticated, isAdmin, checkPasswordSII };

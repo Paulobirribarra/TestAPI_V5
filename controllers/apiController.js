@@ -8,22 +8,33 @@ const getInvoices = async (req, res) => {
         console.log("🟢 Recibida consulta con parámetros:", req.query);
         const config = await Config.findOne();
         const { fecha, mes, anio } = req.query;
+        const passwordSII = req.session.passwordSII;
 
-        const facturas = await apiService.fetchInvoices({ fecha, mes, anio }, config);
+        if (!passwordSII) {
+            return res.redirect('/consulta');
+        }
+
+        const params = {};
+        if (fecha) {
+            params.fecha = fecha;
+        } else if (mes && anio) {
+            params.mes = mes;
+            params.anio = anio;
+        } else {
+            throw new Error('Parámetros de consulta inválidos');
+        }
+
+        const facturas = await apiService.fetchInvoices(params, config, passwordSII);
         const saveResult = await invoiceService.saveInvoices(facturas);
 
-        // Calcular el periodo basado en los parámetros de la consulta
         let periodo;
         if (fecha) {
             const [anioFecha, mesFecha] = fecha.split('-');
             periodo = `${anioFecha}${mesFecha}`;
         } else if (mes && anio) {
             periodo = `${anio}${mes.padStart(2, '0')}`;
-        } else {
-            throw new Error('Parámetros de consulta inválidos');
         }
 
-        // Actualizar ResumenMensual con el periodo y el conteo de facturas guardadas
         await invoiceService.updateResumenMensual(periodo, saveResult.count);
 
         res.json({

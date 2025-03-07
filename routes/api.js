@@ -2,9 +2,16 @@
 const express = require('express');
 const router = express.Router();
 const apiController = require('../controllers/apiController');
-const { isAuthenticated, isAdmin } = require('../middleware/auth'); // Solo importar, no redefinir
+const { isAuthenticated, isAdmin } = require('../middleware/auth');
 
-router.get('/consulta', isAuthenticated, apiController.getInvoices);
+const checkPasswordSII = (req, res, next) => {
+    if (!req.session.passwordSII || req.session.passwordSIIExpires <= Date.now()) {
+        return res.redirect('/consulta');
+    }
+    next();
+};
+
+router.get('/consulta', isAuthenticated, isAdmin, checkPasswordSII, apiController.getInvoices);
 router.get('/actualizar-facturas-pagadas', isAuthenticated, apiController.updatePaidInvoices);
 router.post('/config', isAuthenticated, isAdmin, apiController.saveConfig);
 

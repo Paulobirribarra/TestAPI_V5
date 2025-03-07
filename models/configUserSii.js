@@ -9,14 +9,17 @@ const configUserSiiSchema = new mongoose.Schema({
     ambiente: { type: Number, required: true, enum: [0, 1] },
     detallado: { type: Boolean, default: false },
     updatedAt: { type: Date, default: Date.now }
-});
+}, { collection: 'configUserSii' });
 
-// Hashear la contraseña antes de guardar
 configUserSiiSchema.pre('save', async function (next) {
     if (!this.isModified('passwordSII')) return next();
     const salt = await bcrypt.genSalt(10);
     this.passwordSII = await bcrypt.hash(this.passwordSII, salt);
     next();
 });
+
+configUserSiiSchema.methods.comparePassword = async function (candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.passwordSII);
+};
 
 module.exports = mongoose.model('ConfigUserSii', configUserSiiSchema);
