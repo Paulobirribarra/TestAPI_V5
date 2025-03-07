@@ -5,26 +5,34 @@
     <%- include('partials/head') %>
     <title>Resumen Mensual - FacturasApp</title>
 </head>
-<body>
+<body class="flex-column">
     <%- include('partials/header') %>
 
-    <main class="container">
-        <h1>Resumen Mensual de Facturas</h1>
+    <main class="container flex-grow">
+        <header class="page-header">
+            <h1>Resumen Mensual de Facturas</h1>
+            <!-- <a href="/api/consulta" class="btn-consultar">Consultar Facturas</a> -->
+        </header>
+
         <section class="resumen-mensual">
             <% if (resumenes && resumenes.length > 0) { %>
                 <div class="resumen-grid">
                     <% resumenes.forEach(resumen => { %>
                         <div class="resumen-card">
-                            <h2>Periodo: <%= resumen.periodoFormateado %></h2>
-                            <p><strong>Total Facturas:</strong> $<%= resumen.totalFacturas.toLocaleString() %></p>
-                            <p><strong>Total Notas de Crédito:</strong> $<%= resumen.totalNotasCredito.toLocaleString() %></p>
-                            <p><strong>Monto Neto:</strong> $<%= resumen.montoNeto.toLocaleString() %></p>
-                            <p><strong>Última Actualización:</strong> <%= resumen.ultimaActualizacionFormateada %></p>
+                            <h2 class="card-title"><%= resumen.periodoFormateado %></h2>
+                            <p><strong>Total Facturas:</strong> <span class="monto-facturas">$<%= resumen.totalFacturas.toLocaleString('es-CL') %></span></p>
+                            <p><strong>Total Notas de Crédito:</strong> <span class="monto-notas">$<%= resumen.totalNotasCredito.toLocaleString('es-CL') %></span></p>
+                            <p><strong>Monto Neto:</strong> <span class="monto-neto">$<%= resumen.montoNeto.toLocaleString('es-CL') %></span></p>
+                            <p class="ultima-actualizacion"><strong>Última Actualización:</strong> <%= resumen.ultimaActualizacionFormateada %></p>
                         </div>
                     <% }) %>
                 </div>
             <% } else { %>
-                <p>No hay resúmenes mensuales disponibles. <a href="/api/consulta">Consulta facturas</a> para agregar datos.</p>
+                <div class="no-data">
+                    <p>No hay resúmenes mensuales disponibles.</p>
+                    <p>¡Empieza consultando facturas para ver los datos aquí!</p>
+                    <a href="/api/consulta" class="btn-consultar">Consultar Ahora</a>
+                </div>
             <% } %>
         </section>
     </main>

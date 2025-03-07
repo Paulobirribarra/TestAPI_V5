@@ -1,7 +1,7 @@
 // app.js
 const { app, PORT } = require('./config/server');
 const connectDB = require('./config/database');
-
+const express = require('express');
 //Auth
 const passport = require('./config/Passport');
 const session = require('express-session');
@@ -14,8 +14,10 @@ const notasDeCreditoRoutes = require('./routes/notasDeCredito');
 const configRoutes = require('./routes/config');
 const authRoutes = require('./routes/auth');
 const resumenMensualRoutes = require('./routes/resumenMensual');
+
 // Conectar a la base de datos
 connectDB();
+
 
 // Configuración de sesiones
 app.use(session({
@@ -29,6 +31,8 @@ app.use(session({
         sameSite: 'strict' // Evita que la cookie se envíe en solicitudes cruzadas
     }
 }));
+
+app.use('/css', express.static('public/css'));
 
 // Inicializar Passport
 app.use(passport.initialize());

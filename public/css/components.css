@@ -1,5 +1,7 @@
-/* Botones */
-button {
+/* public/css/components.css */
+
+/* Botones reutilizables */
+.btn {
     margin-top: 5px;
     padding: 5px 10px;
     background-color: #007bff;
@@ -8,9 +10,23 @@ button {
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
+    transition: background-color 0.3s ease;
 }
 
-button:hover {
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Botones específicos dentro de formularios (sobrescriben .btn si necesario) */
+#consulta-form .btn,
+#config-form .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+}
+
+#consulta-form .btn:hover,
+#config-form .btn:hover {
     background-color: #0056b3;
 }
 
@@ -76,18 +92,6 @@ button:hover {
     box-sizing: border-box;
 }
 
-#consulta-form button {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    background-color: #007bff;
-    transition: background-color 0.3s ease;
-}
-
-#consulta-form button:hover {
-    background-color: #0056b3;
-}
-
 /* Mensajes y Loading */
 #mensajeExito {
     background-color: #28a745;
@@ -122,18 +126,16 @@ button:hover {
 
 /* Formulario de Configuración */
 #config-form {
-    background: linear-gradient(135deg, #667eea, #764ba2); /* Gradiente azul claro */
+    background: linear-gradient(135deg, #667eea, #764ba2);
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 6px 15px rgba(0, 123, 255, 0.2);
     max-width: 450px;
     margin: 30px auto;
     border: 1px solid #cce0ff;
-}
-
-#config-form {
     animation: fadeIn 0.5s ease-in;
 }
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -174,7 +176,7 @@ button:hover {
     font-family: monospace;
 }
 
-#config-form button {
+#config-form .btn {
     width: 100%;
     padding: 12px;
     font-size: 16px;
@@ -186,11 +188,12 @@ button:hover {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-#config-form button:hover {
+#config-form .btn:hover {
     background-color: #0056b3;
     transform: translateY(-2px);
 }
 
+/* Formulario de Filtros */
 .filter-form {
     background-color: #fff;
     padding: 15px;
@@ -215,7 +218,23 @@ button:hover {
     font-size: 14px;
 }
 
-.filter-form button {
+.filter-form .btn {
     padding: 8px 15px;
     font-size: 14px;
+}
+
+/* Mensajes de Resultado */
+.resultado-mensaje {
+    background-color: #e7f3e7;
+    color: #2e7d32;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.resultado-mensaje.info {
+    background-color: #e8f0fe;
+    color: #1e3a8a;
 }

@@ -1,31 +1,46 @@
 /* public/css/auth.css */
-.auth-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+/* Contenedor externo para manejar centrado y separación */
+.auth-wrapper {
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical */
+    min-height: calc(100vh - 120px); /* Altura mínima menos el header y footer */
+    padding: 20px 0; /* Espacio arriba y abajo */
 }
 
-.auth-container h1 {
+/* Estilo del contenedor de autenticación */
+.auth-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 350px; /* Ancho máximo ajustado */
     text-align: center;
-    color: #007BFF;
+}
+
+/* Estilo del título */
+.auth-container h1 {
+    color: #007bff;
     margin-bottom: 20px;
     font-size: 24px;
 }
 
+/* Estilo del formulario */
 .auth-container form {
     display: flex;
     flex-direction: column;
 }
 
+/* Estilo de etiquetas */
 .auth-container label {
     margin-bottom: 5px;
     font-weight: bold;
     color: #333;
 }
 
+/* Estilo de inputs y select */
 .auth-container input[type="text"],
 .auth-container input[type="password"],
 .auth-container select {
@@ -42,13 +57,14 @@
 .auth-container input[type="text"]:focus,
 .auth-container input[type="password"]:focus,
 .auth-container select:focus {
-    border-color: #007BFF;
+    border-color: #007bff;
     outline: none;
 }
 
-.auth-container button {
+/* Estilo del botón */
+.auth-container .btn {
     padding: 10px;
-    background-color: #007BFF;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
@@ -57,12 +73,12 @@
     transition: background-color 0.3s ease;
 }
 
-.auth-container button:hover {
+.auth-container .btn:hover {
     background-color: #0056b3;
 }
 
+/* Estilo de mensajes */
 .auth-container p {
-    text-align: center;
     margin-top: 10px;
 }
 
@@ -72,10 +88,11 @@
     margin-bottom: 15px;
 }
 
+/* Estilo del enlace de registro */
 .register-link {
     display: inline-block;
     padding: 8px 15px;
-    background-color: #28a745; /* Verde para destacar */
+    background-color: #28a745;
     color: white;
     text-decoration: none;
     border-radius: 5px;
@@ -84,6 +101,6 @@
 }
 
 .register-link:hover {
-    background-color: #218838; /* Verde más oscuro */
+    background-color: #218838;
     text-decoration: none;
 }

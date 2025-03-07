@@ -1,6 +1,8 @@
+/* public/css/cards.css */
 /* Tarjetas de Facturas */
 .facturas {
     margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .factura-grid {

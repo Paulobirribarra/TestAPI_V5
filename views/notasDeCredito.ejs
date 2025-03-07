@@ -5,7 +5,7 @@
     <h1>Notas de Crédito</h1>
 
     <section class="notas-de-credito">
-        <a href="/">Volver al Inicio</a>
+        <!-- <a href="/">Volver al Inicio</a> -->
         <% if (notasDeCredito.length > 0) { %>
             <div class="factura-grid">
                 <% notasDeCredito.forEach(nota => { %>
@@ -14,7 +14,7 @@
                         <p><strong>Razón Social:</strong> <%= nota.razonSocial %></p>
                         <p><strong>RUT Cliente:</strong> <%= nota.rutCliente %></p>
                         <p><strong>Tipo de Documento:</strong> <%= nota.tipoDTEString %></p>
-                        <p><strong>Fecha de Emisión:</strong> <%= nota.fechaEmision.toDateString() %></p>
+                        <p><strong>Fecha de Emisión:</strong> <%= nota.fechaEmision.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
                         <p><strong>Estado:</strong> <%= nota.estado %></p>
                         <p><strong>Monto Total:</strong> $<%= nota.montoTotal.toLocaleString() %></p>
                         <p><strong>Folio Doc Referencia:</strong> <%= nota.folioDocReferencia %></p>

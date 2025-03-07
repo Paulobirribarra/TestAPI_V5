@@ -10,12 +10,16 @@ const getInvoices = async (req, res) => {
         const { fecha, mes, anio } = req.query;
 
         const facturas = await apiService.fetchInvoices({ fecha, mes, anio }, config);
-        await invoiceService.saveInvoices(facturas);
-        await invoiceService.updateResumenMensual(); // Llamada para actualizar el resumen mensual
+        const saveResult = await invoiceService.saveInvoices(facturas);
+        await invoiceService.updateResumenMensual();
 
-        res.json({ consultaRealizada: true, facturas });
+        res.json({
+            consultaRealizada: true,
+            facturas,
+            saveResult
+        });
     } catch (error) {
-        console.error('❌ Error en getInvoices:', error.message, error.stack);
+        console.error('❌ Error en getInvoices:', error.message);
         res.status(500).json({ error: error.message });
     }
 };

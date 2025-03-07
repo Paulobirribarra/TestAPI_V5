@@ -5,5 +5,23 @@
 <link rel="stylesheet" href="/css/header-footer.css">
 <link rel="stylesheet" href="/css/cards.css">
 <link rel="stylesheet" href="/css/components.css">
-<link rel="stylesheet" href="/public/css/resumenMensual.css">
-
+<% if (typeof pageStyle !== 'undefined' && pageStyle === 'resumenMensual') { %>
+    <link rel="stylesheet" href="/css/resumenMensual.css">
+<% } %>
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    main {
+        flex: 1 0 auto; /* Ocupa el espacio disponible */
+    }
+    footer {
+        flex-shrink: 0; /* Evita que el footer se comprima */
+    }
+</style>

@@ -1,9 +1,13 @@
+/* public/css/header-footer.css */
+
 /* Encabezado (Header) */
 header {
     background-color: #007BFF;
     color: #fff;
     padding: 10px 0;
     text-align: center;
+    flex-shrink: 0;
+    min-height: 60px;
 }
 
 header a.logo {
@@ -36,12 +40,35 @@ nav ul li a:hover {
     text-decoration: none;
 }
 
-/* Pie de Página (Footer) */
+/* Estilos para asegurar que el footer esté abajo */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Asegura que el cuerpo ocupe al menos toda la altura de la ventana */
+}
+
+main {
+    flex: 1 0 auto; /* Permite que el main crezca para ocupar el espacio disponible */
+}
+
 footer {
     background-color: #343a40;
     color: #fff;
     text-align: center;
     padding: 15px;
-    flex-shrink: 0;
     width: 100%;
+    flex-shrink: 0; 
+    min-height: 40px;
+}
+
+/* Ajuste responsivo */
+@media (max-width: 480px) {
+    header, footer {
+        padding: 10px;
+    }
 }

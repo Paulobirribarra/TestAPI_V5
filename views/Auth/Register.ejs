@@ -1,3 +1,4 @@
+<!-- views/auth/register.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,35 +8,39 @@
 </head>
 <body>
     <%- include('../partials/header') %>
-    <main class="auth-container">
-        <h1>Registrar Nuevo Usuario</h1>
-        <% if (isFirstUser) { %>
-            <p style="color: green;">Este será el primer usuario y se registrará como administrador.</p>
-        <% } %>
-        <% if (error) { %>
-            <p class="error"><%= error %></p>
-        <% } %>
-        <form action="/auth/register" method="POST">
-            <label for="username">Usuario:</label>
-            <input type="text" id="username" name="username" required />
+    <main>
+        <div class="auth-wrapper">
+            <div class="auth-container">
+                <h1>Registrar Nuevo Usuario</h1>
+                <% if (isFirstUser) { %>
+                    <p style="color: green;">Este será el primer usuario y se registrará como administrador.</p>
+                <% } %>
+                <% if (error) { %>
+                    <p class="error"><%= error %></p>
+                <% } %>
+                <form action="/auth/register" method="POST">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username" required />
 
-            <label for="password">Contraseña:</label>
-            <input type="password" id="password" name="password" required />
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required />
 
-            <label for="role">Rol:</label>
-            <select id="role" name="role" <% if (isFirstUser) { %> disabled <% } %>>
-                <option value="lector" <% if (!isFirstUser) { %> selected <% } %>>Lector</option>
-                <option value="admin" <% if (isFirstUser) { %> selected <% } %>>Admin</option>
-            </select>
-            <% if (isFirstUser) { %>
-                <input type="hidden" name="role" value="admin">
-            <% } %>
+                    <label for="role">Rol:</label>
+                    <select id="role" name="role" <% if (isFirstUser) { %> disabled <% } %>>
+                        <option value="lector" <% if (!isFirstUser) { %> selected <% } %>>Lector</option>
+                        <option value="admin" <% if (isFirstUser) { %> selected <% } %>>Admin</option>
+                    </select>
+                    <% if (isFirstUser) { %>
+                        <input type="hidden" name="role" value="admin">
+                    <% } %>
 
-            <button type="submit">Registrar</button>
-        </form>
-        <% if (!isFirstUser) { %>
-            <p><a href="/">Volver al inicio</a></p>
-        <% } %>
+                    <button type="submit" class="btn">Registrar</button>
+                </form>
+                <% if (!isFirstUser) { %>
+                    <p><a href="/">Volver al inicio</a></p>
+                <% } %>
+            </div>
+        </div>
     </main>
     <%- include('../partials/footer') %>
 </body>
