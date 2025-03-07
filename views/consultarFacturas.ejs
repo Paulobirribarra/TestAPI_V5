@@ -1,162 +1,159 @@
 <!-- views/consultarFacturas.ejs -->
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <%- include('partials/head') %>
-  </head>
-  <body>
+</head>
+<body>
     <%- include('partials/header') %>
 
     <main>
-      <h1>Consultar Facturas</h1>
+        <h1>Consultar Facturas</h1>
 
-      <form id="consulta-form">
-        <label for="tipoConsulta">Tipo de Consulta:</label>
-        <select id="tipoConsulta">
-          <option value="dia">Por Día</option>
-          <option value="mes">Por Mes</option>
-        </select>
+        <% if (!configSiiExists) { %>
+            <div class="resultado-mensaje info">
+                <p>Primero debes ingresar los datos del consultante del SII. No te preocupes, los datos serán almacenados y encriptados.</p>
+                <a href="/configuracion" class="btn">Ir a Configuración</a>
+            </div>
+        <% } else { %>
+            <form id="consulta-form">
+                <label for="tipoConsulta">Tipo de Consulta:</label>
+                <select id="tipoConsulta">
+                    <option value="dia">Por Día</option>
+                    <option value="mes">Por Mes</option>
+                </select>
 
-        <div id="fecha-container">
-          <label for="fecha">Selecciona una Fecha:</label>
-          <input type="date" id="fecha" />
-        </div>
+                <div id="fecha-container">
+                    <label for="fecha">Selecciona una Fecha:</label>
+                    <input type="date" id="fecha" />
+                </div>
 
-        <div id="mes-container" style="display: none">
-          <label for="mes">Mes:</label>
-          <input type="month" id="mes" />
-        </div>
+                <div id="mes-container" style="display: none">
+                    <label for="mes">Mes:</label>
+                    <input type="month" id="mes" />
+                </div>
 
-        <button type="submit" class="btn">Consultar</button>
-      </form>
+                <button type="submit" class="btn">Consultar</button>
+            </form>
 
-      <div id="loadingIcon">
-        <div class="spinner"></div>
-        <p>Procesando consulta...</p>
-        <div id="progressBarContainer">
-          <div id="progressBar"></div>
-        </div>
-      </div>
+            <div id="loadingIcon">
+                <div class="spinner"></div>
+                <p>Procesando consulta...</p>
+                <div id="progressBarContainer">
+                    <div id="progressBar"></div>
+                </div>
+            </div>
 
-      <div id="mensajeExito" style="display: none">
-        ✅ Consulta realizada con éxito.
-      </div>
-      <div id="mensajeError" style="display: none">
-        ❌ Error en la consulta. Inténtalo de nuevo.
-      </div>
-      <section class="facturas" id="resultado"></section>
+            <div id="mensajeExito" style="display: none">
+                ✅ Consulta realizada con éxito.
+            </div>
+            <div id="mensajeError" style="display: none">
+                ❌ Error en la consulta. Inténtalo de nuevo.
+            </div>
+            <section class="facturas" id="resultado"></section>
+        <% } %>
     </main>
 
     <%- include('partials/footer') %>
 
+    <% if (configSiiExists) { %>
     <script>
-      document
-        .getElementById("tipoConsulta")
-        .addEventListener("change", function () {
-          const tipo = this.value;
-          document.getElementById("fecha-container").style.display =
-            tipo === "dia" ? "block" : "none";
-          document.getElementById("mes-container").style.display =
-            tipo === "mes" ? "block" : "none";
+        document.getElementById("tipoConsulta").addEventListener("change", function () {
+            const tipo = this.value;
+            document.getElementById("fecha-container").style.display = tipo === "dia" ? "block" : "none";
+            document.getElementById("mes-container").style.display = tipo === "mes" ? "block" : "none";
         });
 
-      async function fetchConTimeout(url, timeout = 30000) {
-        const controlador = new AbortController();
-        const id = setTimeout(() => controlador.abort(), timeout);
-        try {
-          const response = await fetch(url, { signal: controlador.signal });
-          clearTimeout(id);
-          return response;
-        } catch (error) {
-          console.error("🚨 Timeout o error de red:", error);
-          throw new Error("La consulta tardó demasiado. Inténtalo de nuevo.");
+        async function fetchConTimeout(url, timeout = 30000) {
+            const controlador = new AbortController();
+            const id = setTimeout(() => controlador.abort(), timeout);
+            try {
+                const response = await fetch(url, { signal: controlador.signal });
+                clearTimeout(id);
+                return response;
+            } catch (error) {
+                console.error("🚨 Timeout o error de red:", error);
+                throw new Error("La consulta tardó demasiado. Inténtalo de nuevo.");
+            }
         }
-      }
 
-      document
-        .getElementById("consulta-form")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
+        document.getElementById("consulta-form").addEventListener("submit", async function (event) {
+            event.preventDefault();
 
-          const tipo = document.getElementById("tipoConsulta").value;
-          let url = "/api/consulta";
+            const tipo = document.getElementById("tipoConsulta").value;
+            let url = "/api/consulta";
 
-          document.getElementById("loadingIcon").style.display = "block";
-          document.getElementById("mensajeExito").style.display = "none";
-          document.getElementById("mensajeError").style.display = "none";
-          document.getElementById("resultado").innerHTML = "";
-          document.getElementById("progressBar").style.width = "0";
+            document.getElementById("loadingIcon").style.display = "block";
+            document.getElementById("mensajeExito").style.display = "none";
+            document.getElementById("mensajeError").style.display = "none";
+            document.getElementById("resultado").innerHTML = "";
+            document.getElementById("progressBar").style.width = "0";
 
-          let progress = 0;
-          const timeout = 30000;
-          const progressInterval = setInterval(() => {
-            progress += 100 / (timeout / 1000);
-            if (progress > 100) progress = 100;
-            document.getElementById("progressBar").style.width = `${progress}%`;
-          }, 1000);
+            let progress = 0;
+            const timeout = 30000;
+            const progressInterval = setInterval(() => {
+                progress += 100 / (timeout / 1000);
+                if (progress > 100) progress = 100;
+                document.getElementById("progressBar").style.width = `${progress}%`;
+            }, 1000);
 
-          try {
-            if (tipo === "dia") {
-              const fecha = document.getElementById("fecha").value;
-              if (!fecha) {
-                alert("Por favor, selecciona una fecha.");
-                return;
-              }
-              url += `?fecha=${fecha}`;
-            } else {
-              const mes = document.getElementById("mes").value;
-              if (!mes) {
-                alert("Por favor, selecciona un mes.");
-                return;
-              }
-              const [anio, mesNum] = mes.split("-");
-              url += `?mes=${mesNum}&anio=${anio}`;
+            try {
+                if (tipo === "dia") {
+                    const fecha = document.getElementById("fecha").value;
+                    if (!fecha) {
+                        alert("Por favor, selecciona una fecha.");
+                        return;
+                    }
+                    url += `?fecha=${fecha}`;
+                } else {
+                    const mes = document.getElementById("mes").value;
+                    if (!mes) {
+                        alert("Por favor, selecciona un mes.");
+                        return;
+                    }
+                    const [anio, mesNum] = mes.split("-");
+                    url += `?mes=${mesNum}&anio=${anio}`;
+                }
+
+                console.log("📋 URL generada para la consulta:", url);
+
+                const response = await fetchConTimeout(url, timeout);
+                const data = await response.json();
+
+                console.log("✅ Respuesta JSON recibida:", data);
+
+                if (response.ok && data.consultaRealizada && data.facturas.length > 0) {
+                    document.getElementById("mensajeExito").style.display = "block";
+
+                    if (data.saveResult.saved) {
+                        document.getElementById("resultado").innerHTML = `
+                            <div class="resultado-mensaje">
+                                ✅ Se trajeron y guardaron ${data.saveResult.count} archivos nuevos exitosamente.
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById("resultado").innerHTML = `
+                            <div class="resultado-mensaje info">
+                                ℹ️ Todas las facturas (${data.facturas.length}) ya existen en la base de datos.
+                            </div>
+                        `;
+                    }
+                } else {
+                    throw new Error(data.error || "No se encontraron facturas.");
+                }
+            } catch (error) {
+                console.error("❌ Error en la consulta:", error);
+                document.getElementById("mensajeError").style.display = "block";
+                document.getElementById("resultado").innerHTML = `<p style="color: red;">${error.message}</p>`;
+            } finally {
+                clearInterval(progressInterval);
+                document.getElementById("progressBar").style.width = "100%";
+                setTimeout(() => {
+                    document.getElementById("loadingIcon").style.display = "none";
+                }, 500);
             }
-
-            console.log("📋 URL generada para la consulta:", url);
-
-            const response = await fetchConTimeout(url, timeout);
-            const data = await response.json();
-
-            console.log("✅ Respuesta JSON recibida:", data);
-
-            if (
-              response.ok &&
-              data.consultaRealizada &&
-              data.facturas.length > 0
-            ) {
-              document.getElementById("mensajeExito").style.display = "block";
-
-              // Mostrar mensaje según el resultado de saveResult
-              if (data.saveResult.saved) {
-                document.getElementById("resultado").innerHTML = `
-                        <div class="resultado-mensaje">
-                            ✅ Se trajeron y guardaron ${data.saveResult.count} archivos nuevos exitosamente.
-                        </div>
-                    `;
-              } else {
-                document.getElementById("resultado").innerHTML = `
-                        <div class="resultado-mensaje info">
-                            ℹ️ Todas las facturas (${data.facturas.length}) ya existen en la base de datos.
-                        </div>
-                    `;
-              }
-              throw new Error(data.error || "No se encontraron facturas.");
-            }
-          } catch (error) {
-            console.error("❌ Error en la consulta:", error);
-            document.getElementById("mensajeError").style.display = "block";
-            document.getElementById(
-              "resultado"
-            ).innerHTML = `<p style="color: red;">${error.message}</p>`;
-          } finally {
-            clearInterval(progressInterval);
-            document.getElementById("progressBar").style.width = "100%";
-            setTimeout(() => {
-              document.getElementById("loadingIcon").style.display = "none";
-            }, 500);
-          }
         });
     </script>
-  </body>
+    <% } %>
+</body>
 </html>

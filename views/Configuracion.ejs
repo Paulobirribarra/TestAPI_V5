@@ -1,3 +1,4 @@
+<!-- views/Configuracion.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,50 +10,125 @@
 
     <main class="container">
         <h1>Configuración</h1>
-        <form id="config-form">
+        
+        <!-- Sección API -->
+        <form id="config-api-form">
+            <h2>Configuración API</h2>
             <label for="apiUser">Usuario API:</label>
             <input type="text" id="apiUser" name="apiUser" value="api" required readonly />
-
             <label for="apiKey">API Key:</label>
             <input type="password" id="apiKey" name="apiKey" placeholder="Ej: ABC123-xyz789" required />
-
-            <button type="submit" class="btn">Guardar Configuración</button>
+            <button type="submit" class="btn">Guardar Configuración API</button>
         </form>
 
-        <div id="mensajeExito">
-            ✅ Configuración guardada con éxito
+        <!-- Sección SII -->
+        <form id="config-sii-form">
+            <h2>Configuración SII</h2>
+            <label for="rutUsuario">RUT Usuario:</label>
+            <input type="text" id="rutUsuario" name="rutUsuario" placeholder="Ej: 12327554-3" required />
+            <label for="passwordSII">Contraseña SII:</label>
+            <input type="password" id="passwordSII" name="passwordSII" placeholder="Ej: Cjri4652@#" required />
+            <label for="rutEmpresa">RUT Empresa:</label>
+            <input type="text" id="rutEmpresa" name="rutEmpresa" placeholder="Ej: 76056638-1" required />
+            <label for="ambiente">Ambiente:</label>
+            <select id="ambiente" name="ambiente" required>
+                <option value="0">Certificación (0)</option>
+                <option value="1">Producción (1)</option>
+            </select>
+            <label for="detallado">Detallado:</label>
+            <select id="detallado" name="detallado">
+                <option value="false">No</option>
+                <option value="true">Sí</option>
+            </select>
+            <button type="submit" class="btn">Guardar Configuración SII</button>
+        </form>
+
+        <div id="mensajeExito" style="display: none;">
+            ✅ Datos guardados y encriptados correctamente
         </div>
-        <div id="mensajeError">
+        <div id="mensajeError" style="display: none;">
             ❌ Error al guardar la configuración
         </div>
     </main>
 
     <script>
-        document.getElementById('config-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const apiUser = document.getElementById('apiUser').value;
-            const apiKey = document.getElementById('apiKey').value;
+        // Guardar Configuración API
+        document.getElementById('config-sii-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const rutUsuario = document.getElementById('rutUsuario').value;
+        const passwordSII = document.getElementById('passwordSII').value;
+        const rutEmpresa = document.getElementById('rutEmpresa').value;
+        const ambiente = document.getElementById('ambiente').value;
+        const detallado = document.getElementById('detallado').value === 'true';
 
-            try {
-                const response = await fetch('/api/config', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ apiUser, apiKey })
-                });
-
-                if (response.ok) {
-                    document.getElementById('mensajeExito').style.display = 'block';
-                    document.getElementById('mensajeError').style.display = 'none';
-                    document.getElementById('apiKey').value = '';
-                } else {
-                    throw new Error('Error en la respuesta del servidor');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('mensajeExito').style.display = 'none';
-                document.getElementById('mensajeError').style.display = 'block';
-            }
+        console.log('📤 Datos enviados al guardar Configuración SII:', {
+            rutUsuario,
+            passwordSII,
+            rutEmpresa,
+            ambiente,
+            detallado
         });
+
+        try {
+            const response = await fetch('/configuracion/sii', { // Cambiado de /config/sii a /configuracion/sii
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rutUsuario, passwordSII, rutEmpresa, ambiente, detallado })
+            });
+
+            if (response.ok) {
+                document.getElementById('mensajeExito').style.display = 'block';
+                document.getElementById('mensajeError').style.display = 'none';
+                document.getElementById('config-sii-form').reset();
+            } else {
+                const errorData = await response.json(); // Capturar el mensaje de error del backend
+                throw new Error(errorData.error || 'Error en la respuesta del servidor');
+            }
+        } catch (error) {
+            console.error('❌ Error al guardar Configuración SII:', error);
+            document.getElementById('mensajeExito').style.display = 'none';
+            document.getElementById('mensajeError').style.display = 'block';
+        }
+    });
+
+        // Guardar Configuración SII
+        document.getElementById('config-sii-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const rutUsuario = document.getElementById('rutUsuario').value;
+        const passwordSII = document.getElementById('passwordSII').value;
+        const rutEmpresa = document.getElementById('rutEmpresa').value;
+        const ambiente = document.getElementById('ambiente').value;
+        const detallado = document.getElementById('detallado').value === 'true';
+
+        // Mostrar los datos que se están enviando
+        console.log('📤 Datos enviados al guardar Configuración SII:', {
+            rutUsuario,
+            passwordSII,
+            rutEmpresa,
+            ambiente,
+            detallado
+        });
+
+        try {
+            const response = await fetch('/config/sii', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rutUsuario, passwordSII, rutEmpresa, ambiente, detallado })
+            });
+
+            if (response.ok) {
+                document.getElementById('mensajeExito').style.display = 'block';
+                document.getElementById('mensajeError').style.display = 'none';
+                document.getElementById('config-sii-form').reset();
+            } else {
+                throw new Error('Error en la respuesta del servidor');
+            }
+        } catch (error) {
+            console.error('❌ Error al guardar Configuración SII:', error);
+            document.getElementById('mensajeExito').style.display = 'none';
+            document.getElementById('mensajeError').style.display = 'block';
+        }
+    });
     </script>
 
     <%- include('partials/footer') %>

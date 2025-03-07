@@ -1,22 +1,24 @@
 // services/apiService.js
 const axios = require('axios');
-require('dotenv').config({ path: '.env' });
 const procesarFacturas = require('../config/procesarFacturas');
+const ConfigUserSii = require('../models/configUserSii');
 
 const API_URL = process.env.API_URL || 'https://servicios.simpleapi.cl';
-const RUT_USUARIO_SII = process.env.RUT_USUARIO;
-const PASSWORD_SII = process.env.PASSWORD_SII;
-const RUT_EMPRESA = process.env.RUT_EMPRESA;
-const AMBIENTE = Number(process.env.AMBIENTE);
 
 const fetchInvoices = async ({ fecha, mes, anio }, config) => {
+    // Obtener datos del SII desde MongoDB
+    const configSii = await ConfigUserSii.findOne();
+    if (!configSii) {
+        throw new Error('No se encontraron datos de configuración del SII');
+    }
+
     let url = '';
     if (fecha) {
-        const [anio, mes, dia] = fecha.split('-'); // '2024-08-12' → ['2024', '08', '12']
-        url = `${API_URL}/api/RCV/ventas/${dia}/${mes}/${anio}`; // dia/mes/anio
+        const [anio, mes, dia] = fecha.split('-');
+        url = `${API_URL}/api/RCV/ventas/${dia}/${mes}/${anio}`;
         console.log("📆 Consultando por día:", fecha, "→ URL generada:", url);
     } else if (mes && anio) {
-        url = `${API_URL}/api/RCV/ventas/${mes}/${anio}`; // mes/anio
+        url = `${API_URL}/api/RCV/ventas/${mes}/${anio}`;
         console.log("📅 Consultando por mes:", mes, anio, "→ URL generada:", url);
     } else {
         throw new Error('Parámetros de consulta inválidos');
@@ -24,7 +26,6 @@ const fetchInvoices = async ({ fecha, mes, anio }, config) => {
 
     const finalApiUser = config?.apiUser || process.env.USER_API;
     const finalApiKey = config?.apiKey || process.env.PASSWORD_API;
-    console.log('🔑 API Key utilizada:', finalApiKey.slice(0, 5) + '...[oculta]');
 
     const headers = {
         'Content-Type': 'application/json',
@@ -32,10 +33,10 @@ const fetchInvoices = async ({ fecha, mes, anio }, config) => {
     };
 
     const body = {
-        RutUSuario: RUT_USUARIO_SII,
-        PassWordSII: PASSWORD_SII,
-        RutEmpresa: RUT_EMPRESA,
-        Ambiente: AMBIENTE,
+        RutUsuario: configSii.rutUsuario,
+        PasswordSII: configSii.passwordSII, // Ya está hasheada, pero la API espera la original; esto se ajustará más adelante si es necesario
+        RutEmpresa: configSii.rutEmpresa,
+        Ambiente: configSii.ambiente,
     };
 
     console.log('📤 Enviando solicitud a la API con URL:', url, 'encabezados:', headers, 'body:', body);

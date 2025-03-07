@@ -35,9 +35,32 @@ const saveInvoices = async (facturas) => {
     }
 };
 
-const updateResumenMensual = async () => {
-    // Lógica para actualizar ResumenMensual (sin cambios)
-    console.log('✅ ResumenMensual actualizado correctamente para todos los periodos');
+const updateResumenMensual = async (periodo, totalFacturas) => {
+    try {
+        console.log(`🔄 Actualizando ResumenMensual para el periodo: ${periodo} con ${totalFacturas} facturas`);
+        const result = await ResumenMensual.updateOne(
+            { periodo },
+            {
+                $set: {
+                    totalFacturas,
+                    updatedAt: new Date()
+                }
+            },
+            { upsert: true } // Si no existe, crea el documento
+        );
+        console.log(`📊 Resultado de la actualización de ResumenMensual:`, result);
+        if (result.matchedCount === 0 && result.upsertedCount === 1) {
+            console.log(`✅ Nuevo periodo ${periodo} creado en ResumenMensual`);
+        } else if (result.modifiedCount > 0) {
+            console.log(`✅ Periodo ${periodo} actualizado en ResumenMensual`);
+        } else {
+            
+            console.log(`ℹ️ No se hicieron cambios en ResumenMensual para el periodo ${periodo}`);
+        }
+    } catch (error) {
+        console.error('❌ Error al actualizar ResumenMensual:', error.message);
+        throw error;
+    }
 };
 
 module.exports = { saveInvoices, updateResumenMensual };

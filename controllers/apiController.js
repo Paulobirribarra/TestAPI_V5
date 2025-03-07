@@ -11,7 +11,20 @@ const getInvoices = async (req, res) => {
 
         const facturas = await apiService.fetchInvoices({ fecha, mes, anio }, config);
         const saveResult = await invoiceService.saveInvoices(facturas);
-        await invoiceService.updateResumenMensual();
+
+        // Calcular el periodo basado en los parámetros de la consulta
+        let periodo;
+        if (fecha) {
+            const [anioFecha, mesFecha] = fecha.split('-');
+            periodo = `${anioFecha}${mesFecha}`;
+        } else if (mes && anio) {
+            periodo = `${anio}${mes.padStart(2, '0')}`;
+        } else {
+            throw new Error('Parámetros de consulta inválidos');
+        }
+
+        // Actualizar ResumenMensual con el periodo y el conteo de facturas guardadas
+        await invoiceService.updateResumenMensual(periodo, saveResult.count);
 
         res.json({
             consultaRealizada: true,

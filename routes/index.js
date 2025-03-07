@@ -4,6 +4,7 @@ const router = express.Router();
 const indexController = require('../controllers/indexController');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
 const Facturas = require('../models/Facturas');
+const ConfigUserSii = require('../models/configUserSii');
 
 router.get('/', isAuthenticated, indexController.getHomePage);
 
@@ -33,9 +34,9 @@ router.post('/factura/update/:id', isAuthenticated, isAdmin, async (req, res) =>
     }
 });
 
-// Nueva ruta protegida para /consulta
-router.get('/consulta', isAuthenticated, (req, res) => {
-    res.render('consultarFacturas');
+router.get('/consulta', isAuthenticated, async (req, res) => {
+    const configSii = await ConfigUserSii.findOne();
+    res.render('consultarFacturas', { configSiiExists: !!configSii });
 });
 
 module.exports = router;
