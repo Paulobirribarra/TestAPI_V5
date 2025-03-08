@@ -17,24 +17,43 @@ const saveSiiConfig = async (req, res) => {
     console.log('📥 Datos recibidos en saveSiiConfig:', req.body);
 
     try {
-        const configSii = await ConfigUserSii.findOneAndUpdate(
-            { rutUsuario }, // Buscar por rutUsuario para actualizar o crear
-            { 
-                rutUsuario, 
-                passwordSII, // Esto será hasheado por el modelo
-                rutEmpresa, 
-                ambiente: parseInt(ambiente), 
+        // Buscar si ya existe un documento con ese rutUsuario
+        let configSii = await ConfigUserSii.findOne({ rutUsuario });
+
+        if (configSii) {
+            // Actualizar el documento existente
+            configSii.rutUsuario = rutUsuario;
+            configSii.passwordSII = passwordSII; // El hook pre('save') lo hasheará
+            configSii.rutEmpresa = rutEmpresa;
+            configSii.ambiente = parseInt(ambiente);
+            configSii.detallado = detallado === 'true' || detallado === true;
+            configSii.updatedAt = new Date();
+        } else {
+            // Crear un nuevo documento
+            configSii = new ConfigUserSii({
+                rutUsuario,
+                passwordSII, // El hook pre('save') lo hasheará
+                rutEmpresa,
+                ambiente: parseInt(ambiente),
                 detallado: detallado === 'true' || detallado === true,
                 updatedAt: new Date()
-            },
-            { upsert: true, new: true, runValidators: true }
-        );
+            });
+        }
+
+        // Guardar el documento (esto disparará el hook pre('save'))
+        try {
+            await configSii.save();
+        } catch (error) {
+            console.error('Error al guardar configuración:', error);
+            return res.redirect('/configuracion?error=No se pudo guardar: problema en base de datos');
+        }
 
         // Guardar el valor plano en la sesión
         req.session.passwordSII = passwordSII;
         req.session.passwordSIIExpires = Date.now() + 2 * 60 * 60 * 1000; // 2 horas
 
-        res.redirect('/consulta'); // Redirigir a la página de consulta
+        console.log('✅ Configuración SII guardada con éxito:', configSii);
+        res.redirect('/consulta');
     } catch (error) {
         console.error('❌ Error en saveSiiConfig:', error);
         res.status(500).render('Configuracion', { error: 'Error al guardar la configuración', user: req.user });

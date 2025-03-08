@@ -35,7 +35,8 @@ const getInvoices = async (req, res) => {
             periodo = `${anio}${mes.padStart(2, '0')}`;
         }
 
-        await invoiceService.updateResumenMensual(periodo, saveResult.count);
+        // Pasar el array completo de facturas, no solo el conteo
+        await invoiceService.updateResumenMensual(periodo, facturas);
 
         res.json({
             consultaRealizada: true,

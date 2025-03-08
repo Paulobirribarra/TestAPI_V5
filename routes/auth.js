@@ -17,6 +17,7 @@ router.get('/login', async (req, res) => {
         req.session.messages = null;
     } catch (error) {
         console.log('🚨 Error al verificar usuarios:', error);
+        return res.redirect('/login?error=Usuario no encontrado');
         res.status(500).send('Error interno');
     }
 });

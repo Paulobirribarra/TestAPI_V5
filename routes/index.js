@@ -63,7 +63,9 @@ router.post('/consulta', isAuthenticated, isAdmin, async (req, res) => {
             user: req.user
         });
     }
-    if (await configSii.comparePassword(passwordSII)) {
+    const isMatch = await configSii.comparePassword(passwordSII);
+    console.log('🔍 Resultado de comparación de contraseña:', isMatch);
+    if (isMatch) {
         req.session.passwordSII = passwordSII; // Guardar el valor plano en la sesión
         req.session.passwordSIIExpires = Date.now() + 2 * 60 * 60 * 1000; // 2 horas
         res.redirect('/consulta');

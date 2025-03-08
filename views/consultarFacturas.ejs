@@ -47,7 +47,7 @@
 
             <div id="loadingIcon" style="display: none">
                 <div class="spinner"></div>
-                <p>Procesando consulta...</p>
+                <p>Procesando consulta... Esto puede tomar hasta un minuto.</p>
                 <div id="progressBarContainer">
                     <div id="progressBar"></div>
                 </div>
@@ -78,7 +78,7 @@
             }
         });
 
-        async function fetchConTimeout(url, timeout = 30000) {
+        async function fetchConTimeout(url, timeout = 50000) {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
             try {

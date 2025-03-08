@@ -35,26 +35,50 @@ const saveInvoices = async (facturas) => {
     }
 };
 
-const updateResumenMensual = async (periodo, totalFacturas) => {
+const updateResumenMensual = async (periodo, documentos) => {
     try {
-        console.log(`🔄 Actualizando ResumenMensual para el periodo: ${periodo} con ${totalFacturas} facturas`);
+        if (!Array.isArray(documentos)) {
+            console.error(`❌ Error: 'documentos' no es un array válido, recibido: ${documentos}`);
+            throw new Error("El parámetro 'documentos' debe ser un array");
+        }
+
+        console.log(`🔄 Actualizando ResumenMensual para el periodo: ${periodo} con ${documentos.length} documentos`);
+
+        let totalFacturas = 0;
+        let totalNotasCredito = 0;
+
+        documentos.forEach(doc => {
+            const montoTotalDoc = Number(doc.montoTotal) || 0;
+            if (doc.tipoDTENumber === 33) { // Facturas electrónicas
+                totalFacturas += montoTotalDoc;
+            } else if (doc.tipoDTENumber === 61) { // Notas de crédito
+                totalNotasCredito += montoTotalDoc;
+            }
+        });
+
+        const montoNeto = totalFacturas - totalNotasCredito;
+
+        console.log(`📊 Calculados: totalFacturas=${totalFacturas}, totalNotasCredito=${totalNotasCredito}, montoNeto=${montoNeto}`);
+
         const result = await ResumenMensual.updateOne(
             { periodo },
             {
                 $set: {
                     totalFacturas,
-                    updatedAt: new Date()
+                    totalNotasCredito,
+                    montoNeto,
+                    fechaActualizacion: new Date()
                 }
             },
-            { upsert: true } // Si no existe, crea el documento
+            { upsert: true }
         );
+
         console.log(`📊 Resultado de la actualización de ResumenMensual:`, result);
         if (result.matchedCount === 0 && result.upsertedCount === 1) {
             console.log(`✅ Nuevo periodo ${periodo} creado en ResumenMensual`);
         } else if (result.modifiedCount > 0) {
             console.log(`✅ Periodo ${periodo} actualizado en ResumenMensual`);
         } else {
-            
             console.log(`ℹ️ No se hicieron cambios en ResumenMensual para el periodo ${periodo}`);
         }
     } catch (error) {

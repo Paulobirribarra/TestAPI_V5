@@ -7,6 +7,6 @@ const modeloBDResumenMensual = new mongoose.Schema({
     totalNotasCredito: { type: Number, default: 0 }, // Suma de montoTotal de tipo 61
     montoNeto: { type: Number, default: 0 }, // totalFacturas - totalNotasCredito
     fechaActualizacion: { type: Date, default: Date.now }
-});
+},{ collection: 'resumenMensual' });
 
 module.exports = mongoose.model('ResumenMensual', modeloBDResumenMensual);
