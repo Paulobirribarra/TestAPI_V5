@@ -1,12 +1,25 @@
 /* public/css/auth.css */
 
+/* Estilos generales */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
 /* Contenedor externo para manejar centrado y separación */
 .auth-wrapper {
     display: flex;
-    justify-content: center; /* Centrado horizontal */
-    align-items: center; /* Centrado vertical */
-    min-height: calc(100vh - 120px); /* Altura mínima menos el header y footer */
-    padding: 20px 0; /* Espacio arriba y abajo */
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px); /* Altura mínima menos header y footer */
+    padding: 20px 0;
 }
 
 /* Estilo del contenedor de autenticación */
@@ -16,31 +29,27 @@
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 350px; /* Ancho máximo ajustado */
+    max-width: 350px;
     text-align: center;
 }
 
-/* Estilo del título */
 .auth-container h1 {
     color: #007bff;
     margin-bottom: 20px;
     font-size: 24px;
 }
 
-/* Estilo del formulario */
 .auth-container form {
     display: flex;
     flex-direction: column;
 }
 
-/* Estilo de etiquetas */
 .auth-container label {
     margin-bottom: 5px;
     font-weight: bold;
     color: #333;
 }
 
-/* Estilo de inputs y select */
 .auth-container input[type="text"],
 .auth-container input[type="password"],
 .auth-container select {
@@ -61,7 +70,6 @@
     outline: none;
 }
 
-/* Estilo del botón */
 .auth-container .btn {
     padding: 10px;
     background-color: #007bff;
@@ -77,7 +85,6 @@
     background-color: #0056b3;
 }
 
-/* Estilo de mensajes */
 .auth-container p {
     margin-top: 10px;
 }
@@ -88,7 +95,6 @@
     margin-bottom: 15px;
 }
 
-/* Estilo del enlace de registro */
 .register-link {
     display: inline-block;
     padding: 8px 15px;
@@ -105,7 +111,7 @@
     text-decoration: none;
 }
 
-/* public/css/auth.css (añadir si no está) */
+/* Estilos para contenedor de contraseña con toggle */
 .password-container {
     position: relative;
     width: 100%;
@@ -128,4 +134,123 @@
 
 .toggle-password:hover {
     text-decoration: underline;
+}
+
+/* Estilos para configuraciones */
+main.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.config-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.config-title h1 {
+    color: #333;
+    font-size: 2em;
+    border-bottom: 3px solid #007bff;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.config-sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.config-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
+}
+
+.config-api {
+    /* Sin max-width específico, usa el de config-container */
+}
+
+.config-sii {
+    /* Sin max-width específico, usa el de config-container */
+}
+
+.config-container h2 {
+    color: #007bff;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+}
+
+.config-container p {
+    margin: 10px 0;
+    color: #666;
+}
+
+.config-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.config-container label {
+    font-weight: bold;
+    color: #555;
+}
+
+.config-container input,
+.config-container select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.config-container input:focus,
+.config-container select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.config-container .btn {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.config-container .btn:hover {
+    background-color: #0056b3;
+}
+
+#mensajeExito,
+#mensajeError {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#mensajeExito {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+#mensajeError {
+    background-color: #f8d7da;
+    color: #721c24;
 }

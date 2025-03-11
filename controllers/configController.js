@@ -2,10 +2,14 @@
 const Config = require('../models/Config');
 const ConfigUserSii = require('../models/configUserSii');
 
+// controllers/configController.js
 const getConfigPage = async (req, res) => {
+    console.log('📢 GET /configuracion llamado');
     try {
         const configSii = await ConfigUserSii.findOne();
-        res.render('Configuracion', { configSii });
+        const apiConfig = await Config.findOne();
+        console.log('📢 apiConfig cargado:', apiConfig);
+        res.render('Configuracion', { configSii, apiConfig });
     } catch (error) {
         console.error('❌ Error en getConfigPage:', error.message);
         res.status(500).send('Error al cargar la página de configuración');

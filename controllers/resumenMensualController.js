@@ -4,6 +4,11 @@ const ResumenMensual = require('../models/ResumenMensual');
 const getResumenMensual = async (req, res) => {
     try {
         const resumenes = await ResumenMensual.find().sort({ periodo: -1 });
+        console.log('📢 Resumenes encontrados en MongoDB:', resumenes); // Log para verificar los datos
+        if (!resumenes || resumenes.length === 0) {
+            console.log('📢 No se encontraron resúmenes mensuales');
+        }
+
         const meses = [
             'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
             'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -26,7 +31,7 @@ const getResumenMensual = async (req, res) => {
         res.render('resumenMensual', { resumenes: resumenesFormateados, pageStyle: 'resumenMensual' });
     } catch (error) {
         console.error('❌ Error en getResumenMensual:', error.message);
-        res.status(500).json({ error: 'Error al obtener el resumen mensual' });
+        res.status(500).render('resumenMensual', { resumenes: [], error: 'Error al obtener el resumen mensual' }); // Renderizar vista con error
     }
 };
 
