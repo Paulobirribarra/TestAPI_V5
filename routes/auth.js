@@ -5,19 +5,18 @@ const passport = require('../config/Passport');
 const User = require('../models/User');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
 
-// Página de login
+// Página de login (sin cambios)
 router.get('/login', async (req, res) => {
     try {
         const userCount = await User.countDocuments();
         console.log('📄 Renderizando página de login, mensajes:', req.session.messages);
         res.render('auth/login', { 
             message: req.session.messages, 
-            showRegisterLink: userCount === 0 // Mostrar enlace si no hay usuarios
+            showRegisterLink: userCount === 0
         });
         req.session.messages = null;
     } catch (error) {
         console.log('🚨 Error al verificar usuarios:', error);
-        return res.redirect('/login?error=Usuario no encontrado');
         res.status(500).send('Error interno');
     }
 });
@@ -29,10 +28,17 @@ router.post('/login', (req, res, next) => {
         successRedirect: '/',
         failureRedirect: '/auth/login',
         failureMessage: true
+    }, (err, user, info) => {
+        if (err) return next(err);
+        if (!user) return res.redirect('/auth/login');
+        req.logIn(user, (err) => {
+            if (err) return next(err);
+            return res.redirect('/');
+        });
     })(req, res, next);
 });
 
-// Página de registro
+// Página de registro (sin cambios)
 router.get('/register', async (req, res) => {
     try {
         const userCount = await User.countDocuments();
@@ -48,32 +54,33 @@ router.get('/register', async (req, res) => {
     }
 });
 
-// Procesar registro
+// Procesar registro (CAMBIOS AQUÍ)
 router.post('/register', async (req, res) => {
-    const { username, password, role } = req.body;
+    const { name, email, password, role } = req.body; // Cambiar username por name y email
+    console.log('📩 POST recibido en /auth/register:', req.body); // Para depurar
     try {
         const userCount = await User.countDocuments();
         if (userCount === 0) {
-            const user = new User({ username, password, role: 'admin' });
+            const user = new User({ name, email: email.toLowerCase(), password, role: 'admin' });
             await user.save();
             return res.redirect('/auth/login');
         }
         isAuthenticated(req, res, () => isAdmin(req, res, async () => {
-            const existingUser = await User.findOne({ username });
+            const existingUser = await User.findOne({ email }); // Buscar por email, no username
             if (existingUser) {
-                return res.render('auth/register', { error: 'El usuario ya existe', isFirstUser: false });
+                return res.render('auth/register', { error: 'El correo ya está registrado', isFirstUser: false });
             }
-            const user = new User({ username, password, role });
+            const user = new User({ name, email: email.toLowerCase(), password, role });
             await user.save();
             res.redirect('/');
         }));
     } catch (error) {
         console.log('🚨 Error al registrar usuario:', error);
-        res.render('auth/register', { error: 'Error al registrar usuario', isFirstUser: false });
+        res.render('auth/register', { error: 'Error al registrar usuario: ' + error.message, isFirstUser: false });
     }
 });
 
-// routes/auth.js
+// Logout
 router.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) {
