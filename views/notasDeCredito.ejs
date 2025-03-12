@@ -1,30 +1,39 @@
-<!-- views/notasDeCredito.ejs -->
-<%- include('partials/header') %>
-<link rel="stylesheet" href="/css/styles.css">
-<main class="container">
-    <h1>Notas de Crédito</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>Notas de Crédito</title>
+</head>
+<body>
+    <%- include('partials/header') %>
 
-    <section class="notas-de-credito">
-        <!-- <a href="/">Volver al Inicio</a> -->
-        <% if (notasDeCredito.length > 0) { %>
-            <div class="factura-grid">
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Notas de Crédito</h1>
+
+        <% if (notasDeCredito && notasDeCredito.length > 0) { %>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
                 <% notasDeCredito.forEach(nota => { %>
-                    <div class="card-nota-de-credito">
-                        <h2>Folio: <%= nota.folio %></h2>
-                        <p><strong>Razón Social:</strong> <%= nota.razonSocial %></p>
-                        <p><strong>RUT Cliente:</strong> <%= nota.rutCliente %></p>
-                        <p><strong>Tipo de Documento:</strong> <%= nota.tipoDTEString %></p>
-                        <p><strong>Fecha de Emisión:</strong> <%= nota.fechaEmision.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
-                        <p><strong>Estado:</strong> <%= nota.estado %></p>
-                        <p><strong>Monto Total:</strong> $<%= nota.montoTotal.toLocaleString() %></p>
-                        <p><strong>Folio Doc Referencia:</strong> <%= nota.folioDocReferencia %></p>
+                    <div class="col">
+                        <div class="card h-100 nota-de-credito-card">
+                            <div class="card-body">
+                                <h2 class="card-title">Folio: <%= nota.folio %></h2>
+                                <p class="card-text"><strong>Razón Social:</strong> <%= nota.razonSocial %></p>
+                                <p class="card-text"><strong>RUT Cliente:</strong> <%= nota.rutCliente %></p>
+                                <p class="card-text"><strong>Tipo de Documento:</strong> <%= nota.tipoDTEString %></p>
+                                <p class="card-text"><strong>Fecha de Emisión:</strong> <%= nota.fechaEmision.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
+                                <p class="card-text"><strong>Estado:</strong> <%= nota.estado %></p>
+                                <p class="card-text"><strong>Monto Total:</strong> $<%= nota.montoTotal.toLocaleString() %></p>
+                                <p class="card-text"><strong>Folio Doc Referencia:</strong> <%= nota.folioDocReferencia %></p>
+                            </div>
+                        </div>
                     </div>
                 <% }) %>
             </div>
         <% } else { %>
-            <p>No hay notas de crédito disponibles. <a href="/consulta">Consulta facturas</a> para agregar nuevas.</p>
+            <p class="text-center">No hay notas de crédito disponibles. <a href="/consulta" class="btn btn-primary">Consulta facturas</a> para agregar nuevas.</p>
         <% } %>
-    </section>
-</main>
+    </main>
 
-<%- include('partials/footer') %>
+    <%- include('partials/footer') %>
+</body>
+</html>

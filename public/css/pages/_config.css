@@ -1,0 +1,26 @@
+.config-sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.config-container {
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 14px;
+    color: #007bff;
+}
+
+.toggle-password:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,9 @@
+/* public/css/pages/_notasDeCredito.css */
+.nota-de-credito-card {
+    border-left: 5px solid #6c757d; /* Gris para diferenciar de las facturas */
+}
+
+.nota-de-credito-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
