@@ -1,19 +1,20 @@
+/* public/css/components/_cards.css */
 /* Estilos para las tarjetas de facturas */
 .card {
     transition: transform 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-10px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .card.pagada {
-    border-left: 5px solid #28a745; /* Verde para facturas pagadas */
+    border-left: 15px solid #28a745; /* Verde para facturas pagadas */
 }
 
 .card.vencida {
-    border-left: 5px solid #dc3545; /* Rojo para facturas vencidas */
+    border-left: 15px solid #dc3545; /* Rojo para facturas vencidas */
 }
 
 .card .card-title {

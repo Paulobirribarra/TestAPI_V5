@@ -2,7 +2,9 @@
 <header>
     <nav class="navbar">
         <div class="container">
-            <a href="/" class="logo">FacturasApp</a>
+            <div class="cabecera">
+                <a href="/" class="logo">FacturasApp</a>
+            </div>
             <ul class="nav-links">
                 <% if (user) { %>
                     <li><a href="/">Facturas</a></li>
@@ -15,7 +17,7 @@
                     <% } %>
                     <li><a href="/auth/logout">Cerrar Sesión (<%= user.name %>)</a></li>
                 <% } else { %>
-                    <li><a href="/auth/login">Iniciar Sesión</a></li>
+                    <!-- <li><a href="/auth/login">Iniciar Sesión</a></li> -->
                 <% } %>
             </ul>
         </div>

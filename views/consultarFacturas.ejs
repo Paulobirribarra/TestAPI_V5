@@ -1,3 +1,4 @@
+<!-- views/consultarFacturas.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,7 +9,9 @@
     <%- include('partials/header') %>
 
     <main>
-        <h1>Consultar Facturas</h1>
+        <div class="title-consulta">
+            <h1>Consultar Facturas</h1>
+        </div>
 
         <% if (!configSiiExists) { %>
             <div class="resultado-mensaje info">

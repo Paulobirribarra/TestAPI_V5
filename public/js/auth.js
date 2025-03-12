@@ -1,3 +1,4 @@
+//public/js/auth.js
 document.getElementById('registerForm').addEventListener('submit', function(event) {
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();

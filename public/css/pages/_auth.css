@@ -47,3 +47,44 @@
 .toggle-password:hover {
     text-decoration: underline;
 }
+.cabecera {
+    background-color: #007bff; /* Color de fondo */
+    padding: 15px 30px; /* Espaciado interno */
+    text-align: right; /* Alinea el contenido a la derecha */
+    margin-right: 20px; /* Margen derecho */
+    border-radius: 8px; /* Bordes redondeados */
+    display: flex; 
+    justify-content: flex-end; /* Alinea el contenido a la derecha */
+    align-items: center; /* Centra verticalmente */
+    margin-bottom: 20px; /* Agrega espacio debajo de la cabecera */
+}
+
+.cabecera .logo {
+    color: white; /* Color del texto */
+    font-size: 35px; /* Tamaño de fuente */
+    font-weight: bold;
+    text-decoration: none; /* Elimina subrayado del enlace */
+}
+.nav-links {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-links li {
+    margin: 0 15px; /* Espaciado entre enlaces */
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 5px 10px;
+}
+
+.nav-links a:hover {
+    background-color: #0056b3;
+    border-radius: 5px;
+}
