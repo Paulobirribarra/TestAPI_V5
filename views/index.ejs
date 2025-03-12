@@ -1,9 +1,9 @@
-<!-- views/index.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <%- include('partials/head') %>
     <title>Listado de Facturas</title>
+    <link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
     <%- include('partials/header') %>
@@ -11,26 +11,31 @@
     <main class="container">
         <h1>Listado de Facturas</h1>
 
+        <!-- Mostrar mensaje de éxito -->
+        <% if (success) { %>
+            <p class="success"><%= success %></p>
+        <% } %>
+
         <!-- Formulario de filtros -->
         <form method="GET" action="/" class="filter-form">
             <label for="folio">Folio:</label>
             <input type="number" id="folio" name="folio" value="<%= filtroFolio %>" />
-        
+
             <label for="estado">Estado:</label>
             <select id="estado" name="estado">
                 <option value="" <%= !filtroEstado ? 'selected' : '' %>>Todos</option>
                 <option value="pagada" <%= filtroEstado === 'pagada' ? 'selected' : '' %>>Pagada</option>
                 <option value="pendiente" <%= filtroEstado === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
             </select>
-        
+
             <label for="contacto">Contacto:</label>
             <input type="text" id="contacto" name="contacto" value="<%= filtroContacto || '' %>" placeholder="Ej: Angelica" />
-        
+
             <button type="submit">Filtrar</button>
         </form>
 
         <section class="facturas">
-                <% if (facturas.length > 0) { %>
+            <% if (facturas.length > 0) { %>
                 <div class="factura-grid">
                     <% facturas.forEach(factura => { %>
                         <%- include('partials/card', { factura: factura }) %>
@@ -45,9 +50,9 @@
                         <span class="pagination-btn disabled">Primera</span>
                         <span class="pagination-btn disabled">Anterior</span>
                     <% } %>
-                
+
                     <span>Página <%= currentPage %> de <%= totalPages %></span>
-                
+
                     <% if (currentPage < totalPages) { %>
                         <a href="/?page=<%= currentPage + 1 %>&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>" class="pagination-btn">Siguiente</a>
                         <a href="/?page=<%= totalPages %>&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>" class="pagination-btn">Última</a>

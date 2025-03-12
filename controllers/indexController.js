@@ -1,4 +1,3 @@
-// controllers/indexController.js
 const Facturas = require('../models/Facturas');
 
 const getHomePage = async (req, res) => {
@@ -70,6 +69,7 @@ const getHomePage = async (req, res) => {
         const montoTotalNotasCredito = totalNotasCreditoMes.length > 0 ? totalNotasCreditoMes[0].total : 0;
         const montoNetoMes = montoTotalFacturas - montoTotalNotasCredito;
 
+        // Pasar la variable success a la vista
         res.render('index', {
             facturas,
             currentPage: page,
@@ -82,8 +82,11 @@ const getHomePage = async (req, res) => {
             filtroMes: mes || '',
             montoTotalFacturas,
             montoTotalNotasCredito,
-            montoNetoMes
+            montoNetoMes,
+            success: req.session.success || null
         });
+        // Limpiar el mensaje de éxito después de renderizar
+        req.session.success = null;
     } catch (error) {
         console.error('❌ Error en getHomePage:', error.message);
         res.status(500).json({ error: 'Error al obtener facturas' });

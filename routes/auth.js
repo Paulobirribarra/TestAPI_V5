@@ -4,16 +4,18 @@ const passport = require('../config/Passport');
 const User = require('../models/User');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
 
-// Página de login (sin cambios)
+// Página de login
 router.get('/login', async (req, res) => {
     try {
         const userCount = await User.countDocuments();
         console.log('📄 Renderizando página de login, mensajes:', req.session.messages);
         res.render('auth/login', { 
-            message: req.session.messages, 
+            message: req.session.messages || null, 
+            success: req.session.success || null,
             showRegisterLink: userCount === 0
         });
         req.session.messages = null;
+        req.session.success = null;
     } catch (error) {
         console.log('🚨 Error al verificar usuarios:', error);
         res.status(500).send('Error interno');
@@ -58,7 +60,6 @@ router.post('/register', async (req, res) => {
     const { name, email, password, role } = req.body;
     console.log('📩 POST recibido en /auth/register:', req.body);
 
-    // Declarar userCount fuera del bloque try para que esté disponible en catch
     let userCount;
     try {
         userCount = await User.countDocuments();
@@ -85,6 +86,8 @@ router.post('/register', async (req, res) => {
         });
 
         await user.save();
+
+        req.session.success = 'Usuario registrado con éxito.';
         return res.redirect(isFirstUser ? '/auth/login' : '/');
     } catch (error) {
         console.log('🚨 Error al registrar usuario:', error);
@@ -128,6 +131,21 @@ router.get('/logout', (req, res, next) => {
             res.redirect('/auth/login');
         });
     });
+});
+
+// Verificar si un email ya está registrado (para validación AJAX)
+router.get('/check-email', async (req, res) => {
+    const { email } = req.query;
+    try {
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (user) {
+            return res.json({ available: false, message: 'El correo ya está registrado.' });
+        }
+        return res.json({ available: true });
+    } catch (error) {
+        console.log('🚨 Error al verificar email:', error);
+        return res.status(500).json({ available: false, message: 'Error al verificar el email.' });
+    }
 });
 
 module.exports = router;

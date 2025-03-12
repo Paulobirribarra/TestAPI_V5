@@ -17,7 +17,7 @@ document.getElementById('registerForm').addEventListener('submit', function(even
         hasError = true;
     }
 
-    // Validar email
+    // Validar email (formato)
     if (!emailRegex.test(email)) {
         document.getElementById('email-error').textContent = 'Por favor, ingresa un correo electrónico válido.';
         hasError = true;
@@ -32,5 +32,34 @@ document.getElementById('registerForm').addEventListener('submit', function(even
     // Si hay algún error, prevenir el envío del formulario
     if (hasError) {
         event.preventDefault();
+    }
+});
+
+// Validación AJAX para el email en tiempo real
+document.getElementById('email').addEventListener('input', async function() {
+    const email = this.value.trim();
+    const emailError = document.getElementById('email-error');
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+    // Limpiar mensaje de error previo
+    emailError.textContent = '';
+
+    // Validar formato del email primero
+    if (!emailRegex.test(email)) {
+        emailError.textContent = 'Por favor, ingresa un correo electrónico válido.';
+        return;
+    }
+
+    // Realizar solicitud AJAX para verificar si el email ya existe
+    try {
+        const response = await fetch(`/auth/check-email?email=${encodeURIComponent(email)}`);
+        const data = await response.json();
+
+        if (!data.available) {
+            emailError.textContent = data.message || 'El correo ya está registrado.';
+        }
+    } catch (error) {
+        console.error('🚨 Error al verificar email:', error);
+        emailError.textContent = 'Error al verificar el email. Intenta nuevamente.';
     }
 });
