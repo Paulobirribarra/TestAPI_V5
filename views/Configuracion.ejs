@@ -47,16 +47,16 @@
                 <p>Ingrese los datos del usuario consultante al SII, estos datos serán almacenados y pueden ser modificados en un futuro. Si los datos son erróneos, la consulta fallará.</p>
                 <form id="config-sii-form">
                     <label for="rutUsuario">RUT Usuario:</label>
-                    <input type="text" id="rutUsuario" name="rutUsuario" placeholder="Ej: 12327554-3" value="<%= configSii ? configSii.rutUsuario : '' %>" required />
+                    <input type="text" id="rutUsuario" name="rutUsuario" placeholder="Ej: 15527554-3" value="<%= configSii ? configSii.rutUsuario : '' %>" required />
 
                     <label for="passwordSII">Contraseña SII:</label>
                     <div class="password-container">
-                        <input type="password" id="passwordSII" name="passwordSII" placeholder="Ej: Cjri4652@#" required />
+                        <input type="password" id="passwordSII" name="passwordSII" placeholder="Ej: Tu Password" required />
                         <span class="toggle-password" onclick="togglePassword('passwordSII')">Mostrar</span>
                     </div>
 
                     <label for="rutEmpresa">RUT Empresa:</label>
-                    <input type="text" id="rutEmpresa" name="rutEmpresa" placeholder="Ej: 76056638-1" value="<%= configSii ? configSii.rutEmpresa : '' %>" required />
+                    <input type="text" id="rutEmpresa" name="rutEmpresa" placeholder="Ej: 75556638-1" value="<%= configSii ? configSii.rutEmpresa : '' %>" required />
 
                     <input type="hidden" id="ambiente" name="ambiente" value="1">
                     <input type="hidden" id="detallado" name="detallado" value="false">
