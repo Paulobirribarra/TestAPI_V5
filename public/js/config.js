@@ -3,13 +3,15 @@
 // Función para alternar visibilidad de contraseña
 function togglePassword(fieldId) {
     const input = document.getElementById(fieldId);
-    const toggleText = input.nextElementSibling;
+    const toggle = input.nextElementSibling;
     if (input.type === 'password') {
         input.type = 'text';
-        toggleText.textContent = 'Ocultar';
+        toggle.textContent = 'Ocultar';
+        console.log(`👁️ Mostrando ${fieldId}`);
     } else {
         input.type = 'password';
-        toggleText.textContent = 'Mostrar';
+        toggle.textContent = 'Mostrar';
+        console.log(`👁️ Ocultando ${fieldId}`);
     }
 }
 
@@ -35,86 +37,126 @@ function toggleEditMode() {
     const editBtn = document.getElementById('edit-btn');
     const saveBtn = document.getElementById('save-btn');
 
-    if (apiUser.readOnly && apiKey.readOnly) {
-        apiUser.removeAttribute('readonly');
-        apiKey.removeAttribute('readonly');
+    if (apiUser.readOnly) {
+        apiUser.readOnly = false;
+        apiKey.readOnly = false;
         editBtn.style.display = 'none';
-        saveBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'block';
+        console.log('✏️ Modo edición activado');
+    } else {
+        apiUser.readOnly = true;
+        apiKey.readOnly = true;
+        editBtn.style.display = 'block';
+        saveBtn.style.display = 'none';
+        console.log('🔒 Modo edición desactivado');
     }
 }
 
 // Configuración API - Manejo del formulario
-document.getElementById('config-api-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const apiUser = document.getElementById('apiUser').value;
-    const apiKey = document.getElementById('apiKey').value;
+console.log('📜 Script config.js cargado');
 
-    if (!apiKey) {
-        alert('Por favor, ingresa una API Key válida.');
-        return;
-    }
+const siiForm = document.getElementById('config-sii-form');
+if (siiForm) {
+    console.log('✅ Formulario config-sii-form encontrado');
+    siiForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('🚀 Evento submit disparado para config-sii-form');
 
-    console.log('📤 Datos enviados al guardar Configuración API:', { apiUser, apiKey });
+        // Obtener los valores del formulario
+        const rutUsuario = document.getElementById('rutUsuario').value;
+        const passwordSII = document.getElementById('passwordSII').value;
+        const rutEmpresa = document.getElementById('rutEmpresa').value;
+        const ambiente = document.getElementById('ambiente').value;
+        const detallado = document.getElementById('detallado').value === 'true';
 
-    try {
-        const response = await fetch('/config/api', { // Ajustado a la ruta correcta
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ apiUser, apiKey })
-        });
-
-        if (response.ok) {
-            document.getElementById('mensajeExito').style.display = 'block';
-            document.getElementById('mensajeError').style.display = 'none';
-            setTimeout(() => location.reload(), 1000); // Recarga después de 1 segundo
-        } else {
-            throw new Error('Error en la respuesta del servidor');
+        // Validar RUTs
+        if (!validaRut(rutUsuario) || !validaRut(rutEmpresa)) {
+            alert('Por favor, ingresa RUTs válidos (Ej: 12327554-3)');
+            return;
         }
-    } catch (error) {
-        console.error('❌ Error al guardar Configuración API:', error);
-        document.getElementById('mensajeExito').style.display = 'none';
-        document.getElementById('mensajeError').style.display = 'block';
-    }
-});
 
-// Configuración SII - Manejo del formulario
-document.getElementById('config-sii-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const rutUsuario = document.getElementById('rutUsuario').value;
-    const passwordSII = document.getElementById('passwordSII').value;
-    const rutEmpresa = document.getElementById('rutEmpresa').value;
-    const ambiente = document.getElementById('ambiente').value;
-    const detallado = document.getElementById('detallado').value === 'true';
-
-    if (!validaRut(rutUsuario) || !validaRut(rutEmpresa)) {
-        alert('Por favor, ingresa RUTs válidos (Ej: 12327554-3)');
-        return;
-    }
-
-    if (!passwordSII) {
-        alert('Por favor, ingresa una contraseña SII.');
-        return;
-    }
-
-    console.log('📤 Datos enviados al guardar Configuración SII:', { rutUsuario, passwordSII, rutEmpresa, ambiente, detallado });
-
-    try {
-        const response = await fetch('/config/sii', { // Ajustado a la ruta correcta
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ rutUsuario, passwordSII, rutEmpresa, ambiente, detallado })
-        });
-
-        if (response.ok) {
-            document.getElementById('mensajeExito').style.display = 'block';
-            document.getElementById('mensajeError').style.display = 'none';
-            setTimeout(() => location.reload(), 1000); // Recarga después de 1 segundo
-        } else {
-            throw new Error('Error en la respuesta del servidor');
+        // Validar contraseña
+        if (!passwordSII) {
+            alert('Por favor, ingresa una contraseña SII.');
+            return;
         }
-    } catch (error) {
-        console.error('❌ Error al guardar Configuración SII:', error);
-        document.getElementById('mensajeExito').style.display = 'none';
-        document.getElementById('mensajeError').style.display = 'block';
-    }
-});
+
+        // Preparar los datos del formulario
+        const formData = new FormData(e.target);
+        console.log('📤 Enviando config SII:', Object.fromEntries(formData));
+
+        try {
+            const response = await fetch('/configuracion/sii', { // Ajustado a la ruta correcta
+                method: 'POST',
+                body: formData
+            });
+            console.log('📥 Respuesta recibida:', response);
+
+            if (response.ok && response.redirected) {
+                console.log('✅ Config SII enviada, redirigiendo a:', response.url);
+                window.location.href = response.url;
+            } else {
+                let result;
+                try {
+                    result = await response.json();
+                    console.error('❌ Error al enviar config SII:', result);
+                } catch (jsonError) {
+                    console.error('❌ Respuesta no es JSON:', await response.text());
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                document.getElementById('mensajeError').style.display = 'block';
+                document.getElementById('mensajeExito').style.display = 'none';
+            }
+        } catch (error) {
+            console.error('❌ Error en fetch config SII:', error);
+            document.getElementById('mensajeError').style.display = 'block';
+            document.getElementById('mensajeExito').style.display = 'none';
+        }
+    });
+} else {
+    console.error('❌ Formulario config-sii-form no encontrado');
+}
+
+const apiForm = document.getElementById('config-api-form');
+if (apiForm) {
+    console.log('✅ Formulario config-api-form encontrado');
+    apiForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        console.log('📤 Enviando config API:', Object.fromEntries(formData));
+
+        try {
+            const response = await fetch('/configuracion/api', { // Ajustado a la ruta correcta
+                method: 'POST',
+                body: formData
+            });
+            console.log('📥 Respuesta recibida:', response);
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    console.log('✅ Config API guardada con éxito');
+                    document.getElementById('mensajeExito').style.display = 'block';
+                    document.getElementById('mensajeError').style.display = 'none';
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    console.error('❌ Error al guardar config API:', result);
+                    document.getElementById('mensajeError').style.display = 'block';
+                    document.getElementById('mensajeExito').style.display = 'none';
+                }
+            } else {
+                console.error('❌ Respuesta no exitosa:', response.status, response.statusText);
+                const text = await response.text();
+                console.error('❌ Contenido de la respuesta:', text);
+                document.getElementById('mensajeError').style.display = 'block';
+                document.getElementById('mensajeExito').style.display = 'none';
+            }
+        } catch (error) {
+            console.error('❌ Error en fetch config API:', error);
+            document.getElementById('mensajeError').style.display = 'block';
+            document.getElementById('mensajeExito').style.display = 'none';
+        }
+    });
+} else {
+    console.error('❌ Formulario config-api-form no encontrado');
+}

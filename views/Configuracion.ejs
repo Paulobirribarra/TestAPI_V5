@@ -21,7 +21,7 @@
                 <% } else { %>
                     <p style="color: green;">Configuración de API Key detectada</p>
                 <% } %>
-                <form id="config-api-form" action="/config/api" method="POST">
+                <form id="config-api-form" action="/configuracion/api" method="POST">
                     <label for="apiUser">Usuario API:</label>
                     <input type="text" id="apiUser" name="apiUser" value="<%= apiConfig ? apiConfig.apiUser : 'api' %>" required <%= apiConfig ? 'readonly' : '' %> />
             
@@ -36,13 +36,13 @@
                 </form>
             </div>
 
-                                    <!-- Mensajes de retroalimentación -->
-                        <% if (typeof error !== 'undefined' && error) { %>
-                            <div id="mensajeError"><%= error %></div>
-                        <% } %>
-                        <% if (typeof success !== 'undefined' && success) { %>
-                            <div id="mensajeExito"><%= success %></div>
-                        <% } %>
+            <!-- Mensajes de retroalimentación -->
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div id="mensajeError"><%= error %></div>
+            <% } %>
+            <% if (typeof success !== 'undefined' && success) { %>
+                <div id="mensajeExito"><%= success %></div>
+            <% } %>
 
             <!-- Contenedor Configuración SII -->
             <div class="config-container config-sii">
@@ -53,7 +53,7 @@
                     <p style="color: green;">Configuración de Usuario SII detectada</p>
                 <% } %>
                 <p>Ingrese los datos del usuario consultante al SII, estos datos serán almacenados y pueden ser modificados en un futuro. Si los datos son erróneos, la consulta fallará.</p>
-                <form id="config-sii-form">
+                <form id="config-sii-form" action="/configuracion/sii" method="POST">
                     <label for="rutUsuario">RUT Usuario:</label>
                     <input type="text" id="rutUsuario" name="rutUsuario" placeholder="Ej: 15527554-3" value="<%= configSii ? configSii.rutUsuario : '' %>" required />
 
@@ -78,7 +78,7 @@
         <div id="mensajeError" style="display: none;">❌ Error al guardar la configuración</div>
     </main>
 
-    <script src="/js/config.js"></script>
     <%- include('partials/footer') %>
+    <script src="/js/config.js"></script>
 </body>
 </html>

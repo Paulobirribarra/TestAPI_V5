@@ -5,7 +5,11 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('./config/Passport');
 const { isAuthenticated, isAdmin } = require('./middleware/auth');
-const Config = require('./models/Config'); // Importar el modelo
+const Config = require('./models/Config'); 
+const multer = require('multer'); 
+
+// Configurar multer para manejar solo campos de formulario (sin archivos)
+const upload = multer();
 
 // Rutas
 const apiRoutes = require('./routes/api');
@@ -37,6 +41,10 @@ connectDB();
             }
         }));
 
+        // Middleware para parsear datos
+        app.use(express.json());
+        app.use(express.urlencoded({ extended: true }));
+        app.use(upload.none()); // Usar multer para parsear multipart/form-data sin archivos
         app.use('/', express.static('public'));
         app.use(passport.initialize());
         app.use(passport.session());
