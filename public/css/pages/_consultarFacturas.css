@@ -1,5 +1,5 @@
 /* Estilos para public/css/pages/consultarFacturas.ejs */
-/* public/css/pages/consultarFacturas.css  */
+/* public/css/pages/consultarFacturas.css */
 .resultado-mensaje {
     padding: 15px;
     margin-bottom: 20px;
@@ -46,53 +46,80 @@
 
 /* Estilos para consultarFacturas.ejs */
 #consulta-form {
-    max-width: 500px; /* Limitar el ancho del formulario */
-    margin: 0 auto; /* Centrar el formulario */
-    padding: 20px;
-    background-color: #ffffff; /* Fondo blanco para destacar */
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
-}
-
-#consulta-form label {
-    display: block; /* Cada label en una nueva línea */
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-#consulta-form select,
-#consulta-form input[type="date"] {
-    width: 100%; /* Asegura que ocupen el ancho del contenedor */
-    margin-bottom: 15px;
-}
-
-#consulta-form .btn {
-    width: 100%; /* Botón ocupa todo el ancho del formulario */
-    padding: 12px; /* Más padding para que sea más grande */
-}
-
-/* Estilos para el div.title */
-.title-consulta {
-    text-align: center; /* Centra el título horizontalmente */
-    padding: 20px 0; /* Espaciado superior e inferior */
-    background-color: #ffffff; /* Color de fondo azul, consistente con el encabezado */
-    margin-bottom: 20px; /* Separación con el formulario */
-    border-radius: 8px; /* Bordes redondeados */
-}
-
-.title-consulta h1 {
-    color: rgb(12, 12, 12); /* Texto blanco para contraste */
-    font-size: 32px; /* Tamaño de fuente prominente */
-    font-weight: 600; /* Peso de la fuente */
-    margin: 0; /* Elimina márgenes predeterminados */
-}
-
-/* Asegúrate de que el formulario esté debajo del título */
-#consulta-form {
-    max-width: 500px; /* Limita el ancho del formulario */
-    margin: 0 auto; /* Centra el formulario */
+    max-width: 500px;
+    margin: 0 auto;
     padding: 20px;
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#consulta-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+#consulta-form select,
+#consulta-form input[type="date"],
+#consulta-form input[type="month"],
+#consulta-form input[type="password"] { /* Agregar input[type="password"] */
+    width: 100%;
+    padding: 10px; /* Asegurar padding consistente */
+    margin-bottom: 20px; /* Asegurar espaciado consistente */
+    border: 1px solid #ddd; /* Asegurar borde consistente */
+    border-radius: 5px; /* Asegurar border-radius consistente */
+    font-size: 16px; /* Asegurar tamaño de fuente consistente */
+    box-sizing: border-box; /* Asegurar box-sizing */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Agregar transición */
+}
+
+#consulta-form select:focus,
+#consulta-form input[type="date"]:focus,
+#consulta-form input[type="month"]:focus,
+#consulta-form input[type="password"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    outline: none;
+}
+
+/* Forzar estilos para el input de contraseña si es necesario */
+#consulta-form #password-form {
+    width: 100%;
+    padding: 10px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 5px !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+#consulta-form #password-form:focus {
+    border-color: #007bff !important;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3) !important;
+    outline: none !important;
+}
+
+#consulta-form .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+}
+
+/* Estilos para el div.title */
+.title-consulta {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #ffffff;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.title-consulta h1 {
+    color: rgb(12, 12, 12);
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0;
 }

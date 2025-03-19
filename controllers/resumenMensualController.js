@@ -4,7 +4,7 @@ const ResumenMensual = require('../models/ResumenMensual');
 const getResumenMensual = async (req, res) => {
     try {
         const resumenes = await ResumenMensual.find().sort({ periodo: -1 });
-        console.log('📢 Resumenes encontrados en MongoDB:', resumenes); // Log para verificar los datos
+        console.log('📢 Resumenes encontrados en MongoDB:', resumenes); 
         if (!resumenes || resumenes.length === 0) {
             console.log('📢 No se encontraron resúmenes mensuales');
         }

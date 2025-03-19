@@ -17,9 +17,9 @@ body {
 
 /* Contenedor Principal */
 .container {
-    width: 80%; /* Reducir a un ancho más manejable */
-    max-width: 1200px; /* Límite máximo para pantallas grandes */
-    margin: 20px auto; /* Añadir margen superior e inferior */
+    width: 90%;
+    max-width: 1400px;
+    margin: 20px auto;
     padding: 20px;
 }
 

@@ -42,11 +42,13 @@ const saveSiiConfig = async (req, res) => {
                 detallado: detallado === 'true' || detallado === true,
                 updatedAt: new Date()
             });
+            console.log('🆕 Creando nueva config SII:', configSii);
         }
 
         // Guardar el documento (esto disparará el hook pre('save'))
         try {
             await configSii.save();
+            console.log('💾 Config SII guardada exitosamente:', configSii);
         } catch (error) {
             console.error('Error al guardar configuración:', error);
             return res.redirect('/configuracion?error=No se pudo guardar: problema en base de datos');

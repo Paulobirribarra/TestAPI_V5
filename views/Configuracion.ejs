@@ -21,19 +21,28 @@
                 <% } else { %>
                     <p style="color: green;">Configuración de API Key detectada</p>
                 <% } %>
-                <form id="config-api-form">
+                <form id="config-api-form" action="/config/api" method="POST">
                     <label for="apiUser">Usuario API:</label>
-                    <input type="text" id="apiUser" name="apiUser" value="api" required <%= apiConfig ? 'readonly' : '' %> />
-
+                    <input type="text" id="apiUser" name="apiUser" value="<%= apiConfig ? apiConfig.apiUser : 'api' %>" required <%= apiConfig ? 'readonly' : '' %> />
+            
                     <label for="apiKey">API Key:</label>
                     <div class="password-container">
-                        <input type="password" id="apiKey" name="apiKey" placeholder="<%= apiConfig ? '*****ACB***' : 'Ej: ABC123-xyz789' %>" required <%= apiConfig ? 'readonly' : '' %> />
+                        <input type="password" id="apiKey" name="apiKey" value="<%= apiConfig ? apiConfig.apiKey : '' %>" placeholder="<%= apiConfig ? '*****ACB***' : 'Ej: ABC123-xyz789' %>" required <%= apiConfig ? 'readonly' : '' %> />
                         <span class="toggle-password" onclick="togglePassword('apiKey')">Mostrar</span>
                     </div>
-
-                    <button type="submit" class="btn"><%= apiConfig ? 'Editar Configuración API' : 'Guardar Configuración API' %></button>
+            
+                    <button type="button" id="edit-btn" class="btn" onclick="toggleEditMode()"><%= apiConfig ? 'Editar Configuración API' : 'Guardar Configuración API' %></button>
+                    <button type="submit" id="save-btn" class="btn" style="display: none;">Guardar Cambios</button>
                 </form>
             </div>
+
+                                    <!-- Mensajes de retroalimentación -->
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <div id="mensajeError"><%= error %></div>
+                        <% } %>
+                        <% if (typeof success !== 'undefined' && success) { %>
+                            <div id="mensajeExito"><%= success %></div>
+                        <% } %>
 
             <!-- Contenedor Configuración SII -->
             <div class="config-container config-sii">

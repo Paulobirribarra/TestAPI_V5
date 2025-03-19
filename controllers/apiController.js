@@ -61,6 +61,7 @@ const updatePaidInvoices = async (req, res) => {
 
 const saveConfig = async (req, res) => {
     const { apiUser, apiKey } = req.body;
+    console.log('📥 Datos recibidos en saveConfig:', { apiUser, apiKey });
     try {
         await Config.findOneAndUpdate({}, { apiUser, apiKey }, { upsert: true, new: true });
         res.json({ success: true });

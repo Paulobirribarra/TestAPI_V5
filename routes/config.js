@@ -5,11 +5,16 @@ const configController = require('../controllers/configController');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
 const Config = require('../models/Config');
 
+console.log('📡 Cargando rutas de configuración');
+
 // Cambiar '/configuracion' a '/'
 router.get('/', isAuthenticated, isAdmin, configController.getConfigPage);
+console.log('📥 Solicitud GET /configuracion recibida');
 router.post('/sii', isAuthenticated, isAdmin, configController.saveSiiConfig);
+console.log('📥 Solicitud POST /config/sii recibida con datos:', req.body);
 
 router.post('/api', isAuthenticated, isAdmin, async (req, res) => {
+    console.log('📥 Solicitud POST /config/api recibida con datos:', req.body);
     const { apiUser, apiKey } = req.body;
     console.log('📥 Datos recibidos en saveApiConfig:', req.body);
     try {

@@ -1,22 +1,4 @@
 /* public/css/components.css */
-
-/* Botones reutilizables */
-.btn {
-    margin-top: 5px;
-    padding: 5px 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-.btn:hover {
-    background-color: #0056b3;
-}
-
 /* Botones específicos dentro de formularios (sobrescriben .btn si necesario) */
 #consulta-form .btn,
 #config-form .btn {
@@ -35,32 +17,48 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
+    gap: 8px;
     margin-top: 20px;
 }
 
-.pagination-btn {
+.pagination .page-item {
+    margin: 0;
+}
+
+.pagination .page-link {
     padding: 8px 15px;
     background-color: #007bff;
     color: white;
-    text-decoration: none;
     border-radius: 5px;
     font-size: 14px;
     transition: background-color 0.3s ease;
+    text-decoration: none;
+    border: 1px solid #007bff;
 }
 
-.pagination-btn:hover:not(.disabled) {
+.pagination .page-link:hover:not(.disabled) {
     background-color: #0056b3;
+    border-color: #0056b3;
 }
 
-.pagination-btn.disabled {
-    background-color: #ccc;
+.pagination .page-item.disabled .page-link {
+    background-color: #e9ecef;
+    color: #6c757d;
+    border-color: #ced4da;
     cursor: not-allowed;
+    opacity: 1;
 }
 
-.pagination span {
-    font-size: 16px;
+.pagination .page-item.disabled .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.pagination .page-item.disabled .page-link[aria-disabled="true"]:not(:first-child):not(:last-child) {
+    background-color: #f8f9fa;
     color: #333;
+    border-color: #ced4da;
+    font-weight: 500;
 }
 
 /* Formulario de Consulta */
@@ -82,7 +80,8 @@
 
 #consulta-form select,
 #consulta-form input[type="date"],
-#consulta-form input[type="month"] {
+#consulta-form input[type="month"],
+#consulta-form input[type="password"] {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -90,6 +89,16 @@
     border-radius: 5px;
     font-size: 16px;
     box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#consulta-form select:focus,
+#consulta-form input[type="date"]:focus,
+#consulta-form input[type="month"]:focus,
+#consulta-form input[type="password"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    outline: none;
 }
 
 /* Mensajes y Loading */
@@ -196,31 +205,66 @@
 /* Formulario de Filtros */
 .filter-form {
     background-color: #fff;
-    padding: 15px;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
+}
+
+.filter-form .row {
+    margin: 0;
+}
+
+.filter-form .col-md-4 {
+    padding: 0 10px;
+    margin-bottom: 20px; /* Aumentar el espaciado vertical */
 }
 
 .filter-form label {
+    display: block;
     font-weight: bold;
     color: #333;
+    margin-bottom: 5px;
 }
 
-.filter-form input[type="number"],
+.filter-form input[type="text"],
+.filter-form input[type="month"],
 .filter-form select {
-    padding: 8px;
+    width: 100%;
+    padding: 12px; /* Aumentar el padding para campos más altos */
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filter-form input[type="text"]:focus,
+.filter-form input[type="month"]:focus,
+.filter-form select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
 .filter-form .btn {
-    padding: 8px 15px;
-    font-size: 14px;
+    padding: 12px; /* Aumentar el padding del botón */
+    font-size: 16px;
+    width: 100%;
+}
+
+/* Ajustes responsivos para el formulario de filtros */
+@media (max-width: 992px) {
+    .filter-form .col-md-4 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 576px) {
+    .filter-form .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
 }
 
 /* Mensajes de Resultado */
@@ -237,4 +281,26 @@
 .resultado-mensaje.info {
     background-color: #e8f0fe;
     color: #1e3a8a;
+}
+
+/* Ajustes responsivos para paginación */
+@media (max-width: 768px) {
+    .pagination {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .pagination .page-item {
+        margin: 5px 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .pagination {
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+    .pagination .page-item {
+        flex: 0 0 auto;
+    }
 }

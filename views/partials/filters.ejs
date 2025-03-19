@@ -1,0 +1,26 @@
+<!-- views/partials/filters.ejs -->
+<form method="GET" action="/" class="filter-form row g-3 mb-4">
+    <div class="col-md-4">
+        <label for="busqueda" class="form-label">Búsqueda General (Folio/Correo/Contacto):</label>
+        <input type="text" id="busqueda" name="busqueda" class="form-control" value="<%= typeof filtroBusqueda !== 'undefined' ? filtroBusqueda : '' %>" placeholder="Ej: 123, ejemplo@dominio.com, Juan Pérez" />
+    </div>
+    <div class="col-md-4">
+        <label for="cliente" class="form-label">Cliente (RUT/Razón Social):</label>
+        <input type="text" id="cliente" name="cliente" class="form-control" value="<%= typeof filtroCliente !== 'undefined' ? filtroCliente : '' %>" placeholder="Ej: 12.345.678-9, Empresa XYZ" />
+    </div>
+    <div class="col-md-4">
+        <label for="estado" class="form-label">Estado:</label>
+        <select id="estado" name="estado" class="form-select">
+            <option value="" <%= !filtroEstado ? 'selected' : '' %>>Todos</option>
+            <option value="pagada" <%= filtroEstado === 'pagada' ? 'selected' : '' %>>Pagada</option>
+            <option value="pendiente" <%= filtroEstado === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label for="fecha" class="form-label">Mes/Año:</label>
+        <input type="month" id="fecha" name="fecha" class="form-control" value="<%= typeof filtroFecha !== 'undefined' ? filtroFecha : '' %>" />
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+    </div>
+</form>

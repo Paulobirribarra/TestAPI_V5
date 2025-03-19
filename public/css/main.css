@@ -1,14 +1,19 @@
 /* Importar todos los archivos parciales */
 /* public/css/main.css */
 @import url('./base/_reset.css');
+@import url('./base/_typography.css');
+@import url('./base/_variables.css');
+@import url('./base.css'); /* Importar base.css para estilos generales */
 @import url('./components/_buttons.css');
 @import url('./components/_forms.css');
 @import url('./components/_toggle.css');
-@import url('./components/_cards.css'); 
+@import url('./components/_cards.css');
 @import url('./pages/_auth.css');
 @import url('./pages/_index.css');
 @import url('./pages/_config.css');
-@import url('./pages/_notasDeCredito.css'); 
+@import url('./pages/_notasDeCredito.css');
 @import url('./pages/_resumenMensual.css');
 @import url('./pages/_consultarFacturas.css');
 @import url('./partials/header-footer.css');
+@import url('./components.css'); /* Importar components.css al final para sobrescribir estilos específicos */
+@import url('./styles.css'); /* Importar styles.css al final para estilos adicionales */

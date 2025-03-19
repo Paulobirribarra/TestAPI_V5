@@ -15,28 +15,8 @@
             <p class="success mb-3 text-center"><%= success %></p>
         <% } %>
 
-        <!-- Formulario de filtros -->
-        <form method="GET" action="/" class="row g-3 mb-4">
-            <div class="col-md-3">
-                <label for="folio" class="form-label">Folio:</label>
-                <input type="number" id="folio" name="folio" class="form-control" value="<%= filtroFolio %>" />
-            </div>
-            <div class="col-md-3">
-                <label for="estado" class="form-label">Estado:</label>
-                <select id="estado" name="estado" class="form-select">
-                    <option value="" <%= !filtroEstado ? 'selected' : '' %>>Todos</option>
-                    <option value="pagada" <%= filtroEstado === 'pagada' ? 'selected' : '' %>>Pagada</option>
-                    <option value="pendiente" <%= filtroEstado === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="contacto" class="form-label">Contacto:</label>
-                <input type="text" id="contacto" name="contacto" class="form-control" value="<%= filtroContacto || '' %>" placeholder="Ej: Angelica" />
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-            </div>
-        </form>
+        <!-- Incluir sección de filtros -->
+        <%- include('partials/filters') %>
 
         <section class="facturas">
             <% if (facturas.length > 0) { %>
@@ -52,10 +32,10 @@
                     <ul class="pagination justify-content-center mt-4">
                         <% if (currentPage > 1) { %>
                             <li class="page-item">
-                                <a class="page-link" href="/?page=1&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>">Primera</a>
+                                <a class="page-link" href="/?page=1&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>">Primera</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="/?page=<%= currentPage - 1 %>&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>">Anterior</a>
+                                <a class="page-link" href="/?page=<%= currentPage - 1 %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>">Anterior</a>
                             </li>
                         <% } else { %>
                             <li class="page-item disabled">
@@ -70,10 +50,10 @@
                         </li>
                         <% if (currentPage < totalPages) { %>
                             <li class="page-item">
-                                <a class="page-link" href="/?page=<%= currentPage + 1 %>&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>">Siguiente</a>
+                                <a class="page-link" href="/?page=<%= currentPage + 1 %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>">Siguiente</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="/?page=<%= totalPages %>&folio=<%= filtroFolio %>&estado=<%= filtroEstado %>">Última</a>
+                                <a class="page-link" href="/?page=<%= totalPages %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>">Última</a>
                             </li>
                         <% } else if (totalPages > 1) { %>
                             <li class="page-item disabled">
