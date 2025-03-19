@@ -23,38 +23,6 @@
     margin-top: 30px;
 }
 
-.factura-card {
-    background-color: #f4f4f4;
-    border: 1px solid #ddd;
-    padding: 15px; /* Reducir el padding */
-    margin: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-    cursor: pointer;
-}
-
-.factura-card:hover {
-    transform: scale(1.05);
-}
-
-.detalles {
-    background-color: #e9e9e9;
-    padding: 8px;
-    border-radius: 5px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-    z-index: 1;
-}
-
-.detalles.visible {
-    transform: translateY(0);
-}
-
 /* Estilo para las tarjetas de facturas */
 .factura-grid {
     display: grid;
@@ -79,14 +47,14 @@
 
 .factura-card h2 {
     color: #007BFF;
-    margin-bottom: 6px; /* Reducir el margen */
-    font-size: 14px; /* Reducir el tamaño */
+    margin-bottom: 6px;
+    font-size: 14px;
 }
 
 .factura-card p {
     color: #555;
-    font-size: 12px; /* Reducir el tamaño */
-    line-height: 1.3; /* Ajustar el interlineado */
+    font-size: 12px;
+    line-height: 1.3;
     margin: 2px 0;
 }
 
@@ -97,4 +65,21 @@
 .factura-card.pagada {
     background-color: #d4edda;
     border: 2px solid #c3e6cb;
+}
+
+.detalles {
+    background-color: #e9e9e9;
+    padding: 8px;
+    border-radius: 5px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 1;
+}
+
+.detalles.visible {
+    transform: translateY(0);
 }

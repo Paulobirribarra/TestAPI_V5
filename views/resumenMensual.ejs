@@ -1,9 +1,9 @@
-<!-- views/resumenMensual.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <%- include('partials/head') %>
     <title>Resumen Mensual - FacturasApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="flex-column">
     <%- include('partials/header') %>
@@ -11,32 +11,64 @@
     <main class="container flex-grow">
         <header class="page-header">
             <h1>Resumen Mensual de Facturas</h1>
-            <!-- <a href="/api/consulta" class="btn-consultar">Consultar Facturas</a> -->
+            <!-- Botón "Consultar Facturas" eliminado -->
         </header>
 
         <section class="resumen-mensual">
-            <% if (resumenes && resumenes.length > 0) { %>
-                <div class="resumen-grid">
-                    <% resumenes.forEach(resumen => { %>
-                        <div class="resumen-card">
-                            <h2 class="card-title"><%= resumen.periodoFormateado %></h2>
-                            <p><strong>Total Facturas:</strong> <span class="monto-facturas">$<%= resumen.totalFacturas.toLocaleString('es-CL') %></span></p>
-                            <p><strong>Total Notas de Crédito:</strong> <span class="monto-notas">$<%= resumen.totalNotasCredito.toLocaleString('es-CL') %></span></p>
-                            <p><strong>Monto Neto:</strong> <span class="monto-neto">$<%= resumen.montoNeto.toLocaleString('es-CL') %></span></p>
-                            <p class="ultima-actualizacion"><strong>Última Actualización:</strong> <%= resumen.ultimaActualizacionFormateada %></p>
-                        </div>
-                    <% }) %>
+            <% if (error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+
+            <% if (Object.keys(groupedResumenes).length > 0) { %>
+                <!-- Gráfico de tendencias -->
+                <div class="chart-container">
+                    <h2>Tendencias de Monto Neto por Año</h2>
+                    <canvas id="montoNetoChart"></canvas>
                 </div>
+
+                <!-- Resúmenes agrupados por año -->
+                <% Object.keys(groupedResumenes).sort().forEach(year => { %>
+                    <div class="year-section">
+                        <h2><%= year %></h2>
+                        <div class="year-totals">
+                            <p><strong>Total Facturas:</strong> $<%= yearlyTotals[year].totalFacturas.toLocaleString('es-CL') %></p>
+                            <p><strong>Total Notas de Crédito:</strong> $<%= yearlyTotals[year].totalNotasCredito.toLocaleString('es-CL') %></p>
+                            <p><strong>Monto Neto Total:</strong> $<%= yearlyTotals[year].montoNeto.toLocaleString('es-CL') %></p>
+                            <p><strong>Promedio Mensual (Monto Neto):</strong> $<%= yearlyTotals[year].averageMontoNeto.toLocaleString('es-CL') %></p>
+                            <% if (yearlyComparisons[year]) { %>
+                                <p><strong>Cambio respecto al año anterior:</strong> 
+                                    <%= yearlyComparisons[year].difference.toLocaleString('es-CL') %> 
+                                    (<%= yearlyComparisons[year].percentageChange > 0 ? '+' : '' %><%= yearlyComparisons[year].percentageChange %>%)</p>
+                            <% } %>
+                        </div>
+
+                        <div class="resumen-grid">
+                            <% groupedResumenes[year].forEach(resumen => { %>
+                                <div class="resumen-card">
+                                    <h3 class="card-title"><%= resumen.periodoFormateado %></h3>
+                                    <p><strong>Total Facturas:</strong> <span class="monto-facturas">$<%= resumen.totalFacturas.toLocaleString('es-CL') %></span></p>
+                                    <p><strong>Total Notas de Crédito:</strong> <span class="monto-notas">$<%= resumen.totalNotasCredito.toLocaleString('es-CL') %></span></p>
+                                    <p><strong>Monto Neto:</strong> <span class="monto-neto">$<%= resumen.montoNeto.toLocaleString('es-CL') %></span></p>
+                                    <p class="ultima-actualizacion"><strong>Última Actualización:</strong> <%= resumen.ultimaActualizacionFormateada %></p>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% }) %>
             <% } else { %>
                 <div class="no-data">
                     <p>No hay resúmenes mensuales disponibles.</p>
                     <p>¡Empieza consultando facturas para ver los datos aquí!</p>
-                    <a href="/api/consulta" class="btn-consultar">Consultar Ahora</a>
+                    <!-- Botón "Consultar Ahora" también eliminado -->
                 </div>
             <% } %>
         </section>
     </main>
 
     <%- include('partials/footer') %>
+    <script id="resumenMensualData" type="application/json">
+        <%- JSON.stringify(groupedResumenes) %>
+    </script>
+    <script src="/js/resumenMensual.js"></script>
 </body>
 </html>
