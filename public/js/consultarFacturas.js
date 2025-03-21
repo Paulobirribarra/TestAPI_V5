@@ -1,4 +1,4 @@
-//public/js/consultarFacturas.js
+// public/js/consultarFacturas.js
 document.getElementById("tipoConsulta").addEventListener("change", function () {
     const tipo = this.value;
     document.getElementById("fecha-container").style.display = tipo === "dia" ? "block" : "none";
@@ -10,11 +10,11 @@ document.getElementById("tipoConsulta").addEventListener("change", function () {
     }
 });
 
-async function fetchConTimeout(url, timeout = 50000) {
+async function fetchConTimeout(url, timeout = 60000) {//esperar 60 segundos para la consulta
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {
-        const response = await fetch(url, { signal: controller.signal });
+        const response = await fetch(url, { signal: controller.signal, credentials: 'include' }); // Incluir cookies
         clearTimeout(id);
         return response;
     } catch (error) {
@@ -27,7 +27,7 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
     event.preventDefault();
 
     const tipo = document.getElementById("tipoConsulta").value;
-    let url = "/api/consulta?";
+    let url = "https://localhost:3000/api/consulta?";
 
     const params = new URLSearchParams();
     if (tipo === "dia") {
@@ -62,7 +62,7 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
     document.getElementById("progressBar").style.width = "0";
 
     let progress = 0;
-    const timeout = 30000;
+    const timeout = 60000;
     const progressInterval = setInterval(() => {
         progress += 100 / (timeout / 1000);
         if (progress > 100) progress = 100;

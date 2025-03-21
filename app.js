@@ -1,12 +1,15 @@
 // app.js
-const { app, PORT } = require('./config/server');
+const { app } = require('./config/server');
 const connectDB = require('./config/database');
 const express = require('express');
 const session = require('express-session');
 const passport = require('./config/Passport');
 const { isAuthenticated, isAdmin } = require('./middleware/auth');
-const Config = require('./models/Config'); 
-const multer = require('multer'); 
+const Config = require('./models/Config');
+const multer = require('multer');
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
 
 // Configurar multer para manejar solo campos de formulario (sin archivos)
 const upload = multer();
@@ -34,7 +37,7 @@ connectDB();
             resave: false,
             saveUninitialized: false,
             cookie: {
-                secure: false, // Cambia a `true` si usas HTTPS en producción
+                secure: true, // Requiere HTTPS
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000, // 24 horas
                 sameSite: 'strict'
@@ -74,10 +77,25 @@ connectDB();
         app.use('/resumenMensual', resumenMensualRoutes);
         app.use(require('./middleware/errorHandler'));
 
-        // Iniciar servidor
-        app.listen(PORT, () => {
-            console.log(`Servidor corriendo en http://localhost:${PORT}`);
+        // Configuración HTTPS
+        const options = {
+            key: fs.readFileSync('config/key.pem'),
+            cert: fs.readFileSync('config/cert.pem')
+        };
+
+        // Iniciar servidor HTTPS en puerto 3000
+        https.createServer(options, app).listen(3000, () => {
+            console.log('Servidor HTTPS corriendo en https://localhost:3000');
         });
+
+        // Redirección HTTP a HTTPS en puerto 80
+        http.createServer((req, res) => {
+            res.writeHead(301, { Location: `https://localhost:3000${req.url}` });
+            res.end();
+        }).listen(80, () => {
+            console.log('Servidor HTTP redirigiendo a HTTPS en http://localhost:80');
+        });
+
     } catch (error) {
         console.error('Error al iniciar la aplicación:', error);
         process.exit(1);

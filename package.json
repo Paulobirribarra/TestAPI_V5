@@ -4,6 +4,7 @@
   "description": "Este proyecto es una aplicación para gestionar facturas y notas de crédito. La aplicación consulta datos desde una API externa, los almacena en una base de datos MongoDB y permite a los usuarios visualizar y editar información relacionada con las facturas.",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon app.js",
     "dev": "nodemon app.js"
   },
   "keywords": [],

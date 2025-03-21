@@ -1,3 +1,4 @@
 node_modules/
+config/key.pem
+config/cert.pem
 .env
-08-2024-response.json
