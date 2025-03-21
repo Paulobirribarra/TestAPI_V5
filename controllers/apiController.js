@@ -62,6 +62,13 @@ const updatePaidInvoices = async (req, res) => {
 const saveConfig = async (req, res) => {
     const { apiUser, apiKey } = req.body;
     console.log('📥 Datos recibidos en saveConfig:', { apiUser, apiKey });
+
+    // Validar apiUser y apiKey (alfanuméricos y guiones, 3-50 caracteres)
+    const apiRegex = /^[\w-]{3,50}$/;
+    if (!apiRegex.test(apiUser) || !apiRegex.test(apiKey)) {
+        return res.status(400).json({ error: 'Usuario API y API Key deben ser 3-50 caracteres alfanuméricos o guiones.' });
+    }
+
     try {
         await Config.findOneAndUpdate({}, { apiUser, apiKey }, { upsert: true, new: true });
         res.json({ success: true });

@@ -74,6 +74,30 @@ router.post('/register', async (req, res) => {
         });
     }
 
+    // Validar nombre (solo letras y espacios, 2-50 caracteres)
+    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
+    if (!nameRegex.test(name)) {
+        return res.render('auth/register', {
+            error: 'El nombre debe tener 2-50 caracteres y solo letras o espacios.',
+            isFirstUser: userCount === 0,
+            name: name || '',
+            email: email || '',
+            role: role || (userCount === 0 ? 'admin' : 'lector')
+        });
+    }
+
+    // Validar email (básico)
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    if (!emailRegex.test(email)) {
+        return res.render('auth/register', {
+            error: 'Por favor, ingresa un correo electrónico válido.',
+            isFirstUser: userCount === 0,
+            name: name || '',
+            email: email || '',
+            role: role || (userCount === 0 ? 'admin' : 'lector')
+        });
+    }
+
     try {
         const isFirstUser = userCount === 0;
         const newRole = isFirstUser ? 'admin' : role || 'lector';

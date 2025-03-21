@@ -1,8 +1,7 @@
-// controllers/configController.js
+//controllers/configControllers
 const Config = require('../models/Config');
 const ConfigUserSii = require('../models/configUserSii');
 
-// controllers/configController.js
 const getConfigPage = async (req, res) => {
     console.log('📢 GET /configuracion llamado');
     try {
@@ -20,44 +19,46 @@ const saveSiiConfig = async (req, res) => {
     const { rutUsuario, passwordSII, rutEmpresa, ambiente, detallado } = req.body;
     console.log('📥 Datos recibidos en saveSiiConfig:', req.body);
 
-    try {
-        // Buscar si ya existe un documento con ese rutUsuario
-        let configSii = await ConfigUserSii.findOne({ rutUsuario });
+    // Validar RUTs (formato chileno: 12345678-9)
+    const rutRegex = /^\d{1,8}-[\dkK]$/;
+    if (!rutRegex.test(rutUsuario) || !rutRegex.test(rutEmpresa)) {
+        return res.status(400).render('Configuracion', { error: 'RUTs inválidos. Usa formato 12345678-9.', user: req.user });
+    }
 
+    // Validar passwordSII (alfanuméricos y caracteres especiales básicos, 6-20 caracteres)
+    const passwordRegex = /^[\w@#\$%^&*]{6,20}$/;
+    if (!passwordRegex.test(passwordSII)) {
+        return res.status(400).render('Configuracion', { error: 'Contraseña SII inválida. Usa 6-20 caracteres alfanuméricos y @#$%^&*.', user: req.user });
+    }
+
+    // Validar ambiente
+    if (![0, 1].includes(parseInt(ambiente))) {
+        return res.status(400).render('Configuracion', { error: 'Ambiente debe ser 0 o 1.', user: req.user });
+    }
+
+    try {
+        let configSii = await ConfigUserSii.findOne({ rutUsuario });
         if (configSii) {
-            // Actualizar el documento existente
             configSii.rutUsuario = rutUsuario;
-            configSii.passwordSII = passwordSII; // El hook pre('save') lo hasheará
+            configSii.passwordSII = passwordSII; // Hook lo hashea
             configSii.rutEmpresa = rutEmpresa;
             configSii.ambiente = parseInt(ambiente);
             configSii.detallado = detallado === 'true' || detallado === true;
             configSii.updatedAt = new Date();
         } else {
-            // Crear un nuevo documento
             configSii = new ConfigUserSii({
                 rutUsuario,
-                passwordSII, // El hook pre('save') lo hasheará
+                passwordSII,
                 rutEmpresa,
                 ambiente: parseInt(ambiente),
                 detallado: detallado === 'true' || detallado === true,
                 updatedAt: new Date()
             });
-            console.log('🆕 Creando nueva config SII:', configSii);
         }
 
-        // Guardar el documento (esto disparará el hook pre('save'))
-        try {
-            await configSii.save();
-            console.log('💾 Config SII guardada exitosamente:', configSii);
-        } catch (error) {
-            console.error('Error al guardar configuración:', error);
-            return res.redirect('/configuracion?error=No se pudo guardar: problema en base de datos');
-        }
-
-        // Guardar el valor plano en la sesión
+        await configSii.save();
         req.session.passwordSII = passwordSII;
-        req.session.passwordSIIExpires = Date.now() + 2 * 60 * 60 * 1000; // 2 horas
-
+        req.session.passwordSIIExpires = Date.now() + 30 * 60 * 1000; // password sii se solicita cada 30 minutos
         console.log('✅ Configuración SII guardada con éxito:', configSii);
         res.redirect('/consulta');
     } catch (error) {
@@ -65,4 +66,5 @@ const saveSiiConfig = async (req, res) => {
         res.status(500).render('Configuracion', { error: 'Error al guardar la configuración', user: req.user });
     }
 };
+
 module.exports = { getConfigPage, saveSiiConfig };

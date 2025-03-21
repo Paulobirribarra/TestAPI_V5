@@ -1,84 +1,110 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <%- include('partials/head') %>
-    <title>Configuración - FacturasApp</title>
+        <title>Configuración - FacturasApp</title>
 </head>
+
 <body>
     <%- include('partials/header') %>
 
-    <main class="container">
-        <div class="config-title">
-            <h1>Configuración</h1>
-        </div>
-
-        <div class="config-sections">
-            <!-- Contenedor Configuración API -->
-            <div class="config-container config-api">
-                <h2>Configuración API</h2>
-                <% if (!apiConfig) { %>
-                    <p style="color: red;">Ingresa una API Key válida</p>
-                <% } else { %>
-                    <p style="color: green;">Configuración de API Key detectada</p>
-                <% } %>
-                <form id="config-api-form" action="/configuracion/api" method="POST">
-                    <label for="apiUser">Usuario API:</label>
-                    <input type="text" id="apiUser" name="apiUser" value="<%= apiConfig ? apiConfig.apiUser : 'api' %>" required <%= apiConfig ? 'readonly' : '' %> />
-            
-                    <label for="apiKey">API Key:</label>
-                    <div class="password-container">
-                        <input type="password" id="apiKey" name="apiKey" value="<%= apiConfig ? apiConfig.apiKey : '' %>" placeholder="<%= apiConfig ? '*****ACB***' : 'Ej: ABC123-xyz789' %>" required <%= apiConfig ? 'readonly' : '' %> />
-                        <span class="toggle-password" onclick="togglePassword('apiKey')">Mostrar</span>
-                    </div>
-            
-                    <button type="button" id="edit-btn" class="btn" onclick="toggleEditMode()"><%= apiConfig ? 'Editar Configuración API' : 'Guardar Configuración API' %></button>
-                    <button type="submit" id="save-btn" class="btn" style="display: none;">Guardar Cambios</button>
-                </form>
+        <main class="container">
+            <div class="config-title">
+                <h1>Configuración</h1>
             </div>
 
-            <!-- Mensajes de retroalimentación -->
-            <% if (typeof error !== 'undefined' && error) { %>
-                <div id="mensajeError"><%= error %></div>
-            <% } %>
-            <% if (typeof success !== 'undefined' && success) { %>
-                <div id="mensajeExito"><%= success %></div>
-            <% } %>
+            <div class="config-sections">
+                <!-- Configuración API -->
+                <div class="config-container config-api">
+                    <h2>Configuración API</h2>
+                    <% if (!apiConfig) { %>
+                        <p style="color: red;">Ingresa una API Key válida</p>
+                        <% } else { %>
+                            <p style="color: green;">Configuración de API Key detectada</p>
+                            <% } %>
+                                <form id="config-api-form" action="/configuracion/api" method="POST">
+                                    <label for="apiUser">Usuario API:</label>
+                                    <input type="text" id="apiUser" name="apiUser"
+                                        value="<%= apiConfig ? apiConfig.apiUser : 'api' %>" required <%=apiConfig
+                                        ? 'readonly' : '' %> />
 
-            <!-- Contenedor Configuración SII -->
-            <div class="config-container config-sii">
-                <h2>Configuración SII</h2>
-                <% if (!configSii) { %>
-                    <p style="color: red;">No se ha configurado un usuario SII</p>
-                <% } else { %>
-                    <p style="color: green;">Configuración de Usuario SII detectada</p>
-                <% } %>
-                <p>Ingrese los datos del usuario consultante al SII, estos datos serán almacenados y pueden ser modificados en un futuro. Si los datos son erróneos, la consulta fallará.</p>
-                <form id="config-sii-form" action="/configuracion/sii" method="POST">
-                    <label for="rutUsuario">RUT Usuario:</label>
-                    <input type="text" id="rutUsuario" name="rutUsuario" placeholder="Ej: 15527554-3" value="<%= configSii ? configSii.rutUsuario : '' %>" required />
+                                    <label for="apiKey">API Key:</label>
+                                    <div class="password-container">
+                                        <input type="password" id="apiKey" name="apiKey"
+                                            value="<%= apiConfig ? apiConfig.apiKey : '' %>"
+                                            placeholder="<%= apiConfig ? '*****ACB***' : 'Ej: ABC123-xyz789' %>"
+                                            required <%=apiConfig ? 'readonly' : '' %> />
+                                        <span id="toggle-apiKey" class="toggle-password">Mostrar</span>
+                                    </div>
 
-                    <label for="passwordSII">Contraseña SII:</label>
-                    <div class="password-container">
-                        <input type="password" id="passwordSII" name="passwordSII" placeholder="Ej: Tu Password" required />
-                        <span class="toggle-password" onclick="togglePassword('passwordSII')">Mostrar</span>
+                                    <button type="button" id="edit-btn" class="btn">
+                                        <%= apiConfig ? 'Editar Configuración API' : 'Guardar Configuración API' %>
+                                    </button>
+                                    <button type="submit" id="save-btn" class="btn" style="display: none;">Guardar
+                                        Cambios</button>
+                                </form>
+                </div>
+
+                <!-- Mensajes de retroalimentación -->
+                <% if (typeof error !=='undefined' && error) { %>
+                    <div id="mensajeError">
+                        <%= error %>
                     </div>
+                    <% } %>
+                        <% if (typeof success !=='undefined' && success) { %>
+                            <div id="mensajeExito">
+                                <%= success %>
+                            </div>
+                            <% } %>
 
-                    <label for="rutEmpresa">RUT Empresa:</label>
-                    <input type="text" id="rutEmpresa" name="rutEmpresa" placeholder="Ej: 75556638-1" value="<%= configSii ? configSii.rutEmpresa : '' %>" required />
+                                <!-- Configuración SII -->
+                                <div class="config-container config-sii">
+                                    <h2>Configuración SII</h2>
+                                    <% if (!configSii) { %>
+                                        <p style="color: red;">No se ha configurado un usuario SII</p>
+                                        <% } else { %>
+                                            <p style="color: green;">Configuración de Usuario SII detectada</p>
+                                            <% } %>
+                                                <p>Ingrese los datos del usuario consultante al SII, estos datos serán
+                                                    almacenados y pueden ser modificados en un futuro. Si los datos son
+                                                    erróneos, la consulta fallará.</p>
+                                                <form id="config-sii-form" action="/configuracion/sii" method="POST">
+                                                    <label for="rutUsuario">RUT Usuario:</label>
+                                                    <input type="text" id="rutUsuario" name="rutUsuario"
+                                                        placeholder="Ej: 15527554-3"
+                                                        value="<%= configSii ? configSii.rutUsuario : '' %>" required />
 
-                    <input type="hidden" id="ambiente" name="ambiente" value="1">
-                    <input type="hidden" id="detallado" name="detallado" value="false">
+                                                    <label for="passwordSII">Contraseña SII:</label>
+                                                    <div class="password-container">
+                                                        <input type="password" id="passwordSII" name="passwordSII"
+                                                            placeholder="Ej: Tu Password" required />
+                                                        <span id="toggle-passwordSII"
+                                                            class="toggle-password">Mostrar</span>
+                                                    </div>
 
-                    <button type="submit" class="btn"><%= configSii ? 'Editar Configuración SII' : 'Guardar Configuración SII' %></button>
-                </form>
-            </div>
-        </div>
+                                                    <label for="rutEmpresa">RUT Empresa:</label>
+                                                    <input type="text" id="rutEmpresa" name="rutEmpresa"
+                                                        placeholder="Ej: 75556638-1"
+                                                        value="<%= configSii ? configSii.rutEmpresa : '' %>" required />
 
-        <div id="mensajeExito" style="display: none;">✅ Datos guardados y encriptados correctamente</div>
-        <div id="mensajeError" style="display: none;">❌ Error al guardar la configuración</div>
-    </main>
+                                                    <input type="hidden" id="ambiente" name="ambiente" value="1">
+                                                    <input type="hidden" id="detallado" name="detallado" value="false">
 
-    <%- include('partials/footer') %>
-    <script src="/js/config.js"></script>
+                                                    <button type="submit" class="btn">
+                                                        <%= configSii ? 'Editar Configuración SII'
+                                                            : 'Guardar Configuración SII' %>
+                                                    </button>
+                                                </form>
+                                </div>
+
+                                <div id="mensajeExito" style="display: none;">✅ Datos guardados y encriptados
+                                    correctamente</div>
+                                <div id="mensajeError" style="display: none;">❌ Error al guardar la configuración</div>
+        </main>
+
+        <%- include('partials/footer') %>
+            <script src="/js/config.js"></script>
 </body>
+
 </html>
