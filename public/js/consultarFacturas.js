@@ -10,7 +10,7 @@ document.getElementById("tipoConsulta").addEventListener("change", function () {
     }
 });
 
-async function fetchConTimeout(url, timeout = 60000) {//esperar 60 segundos para la consulta
+async function fetchConTimeout(url, timeout = 120000) {//esperar 120 segundos para la consulta
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {
@@ -95,6 +95,12 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
         }
     } catch (error) {
         console.error("❌ Error en la consulta:", error);
+        console.error("🔍 Detalles del error:", {
+            message: error.message,
+            stack: error.stack,
+            name: error.name,
+            response: error.response
+        });
         document.getElementById("mensajeError").style.display = "block";
         document.getElementById("resultado").innerHTML = `<p style="color: red;">${error.message}</p>`;
     } finally {

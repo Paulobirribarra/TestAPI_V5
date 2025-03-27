@@ -1,40 +1,118 @@
 <!-- views/notasDeCredito.ejs -->
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <%- include('partials/head') %>
     <title>Notas de Crédito</title>
-</head>
-<body>
+  </head>
+  <body>
     <%- include('partials/header') %>
 
     <main class="container py-4">
-        <h1 class="text-center mb-4">Notas de Crédito</h1>
+      <h1 class="text-center mb-4">Notas de Crédito</h1>
 
-        <% if (notasDeCredito && notasDeCredito.length > 0) { %>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                <% notasDeCredito.forEach(nota => { %>
-                    <div class="col">
-                        <div class="card h-100 nota-de-credito-card">
-                            <div class="card-body">
-                                <h2 class="card-title">Folio: <%= nota.folio %></h2>
-                                <p class="card-text"><strong>Razón Social:</strong> <%= nota.razonSocial %></p>
-                                <p class="card-text"><strong>RUT Cliente:</strong> <%= nota.rutCliente %></p>
-                                <p class="card-text"><strong>Tipo de Documento:</strong> <%= nota.tipoDTEString %></p>
-                                <p class="card-text"><strong>Fecha de Emisión:</strong> <%= nota.fechaEmision.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
-                                <p class="card-text"><strong>Estado:</strong> <%= nota.estado %></p>
-                                <p class="card-text"><strong>Monto Total:</strong> $<%= nota.montoTotal.toLocaleString() %></p>
-                                <p class="card-text"><strong>Folio Doc Referencia:</strong> <%= nota.folioDocReferencia %></p>
-                            </div>
-                        </div>
-                    </div>
-                <% }) %>
+      <!-- Filtros -->
+      <div class="filters-container mb-4">
+        <form action="/notasDeCredito" method="GET" class="filters-form">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label for="folioFilter" class="form-label">Folio</label>
+              <input type="text" name="folio" id="folioFilter" class="form-control" 
+                     value="<%= filters.folio || '' %>" placeholder="Buscar por folio">
             </div>
-        <% } else { %>
-            <p class="text-center">No hay notas de crédito disponibles. <a href="/consulta" class="btn btn-primary">Consulta facturas</a> para agregar nuevas.</p>
+            <div class="col-md-3">
+              <label for="yearFilter" class="form-label">Año</label>
+              <select name="year" id="yearFilter" class="form-select">
+                <option value="">Todos los años</option>
+                <% const currentYear = new Date().getFullYear(); %>
+                <% for(let y = currentYear; y >= currentYear - 5; y--) { %>
+                  <option value="<%= y %>" <%= filters.year == y ? 'selected' : '' %>><%= y %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="monthFilter" class="form-label">Mes</label>
+              <select name="month" id="monthFilter" class="form-select">
+                <option value="">Todos los meses</option>
+                <% const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; %>
+                <% months.forEach((month, index) => { %>
+                  <option value="<%= (index + 1).toString().padStart(2, '0') %>" 
+                          <%= filters.month == (index + 1).toString().padStart(2, '0') ? 'selected' : '' %>>
+                    <%= month %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="limit" class="form-label">Registros por página</label>
+              <select name="limit" id="limit" class="form-select">
+                <option value="10" <%= pagination.limit == 10 ? 'selected' : '' %>>10</option>
+                <option value="25" <%= pagination.limit == 25 ? 'selected' : '' %>>25</option>
+                <option value="50" <%= pagination.limit == 50 ? 'selected' : '' %>>50</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <% if (error) { %>
+        <div class="alert alert-danger" role="alert">
+          <%= error %>
+        </div>
+      <% } %>
+
+      <% if (notasDeCredito && notasDeCredito.length > 0) { %>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <% notasDeCredito.forEach(nota => { %>
+            <div class="col">
+              <div class="card h-100 nota-de-credito-card">
+                <div class="card-body">
+                  <h2 class="card-title">Folio: <%= nota.folio %></h2>
+                  <p class="card-text"><strong>Razón Social:</strong> <%= nota.razonSocial %></p>
+                  <p class="card-text"><strong>RUT Cliente:</strong> <%= nota.rutCliente %></p>
+                  <p class="card-text"><strong>Tipo de Documento:</strong> <%= nota.tipoDTEString %></p>
+                  <p class="card-text"><strong>Fecha de Emisión:</strong> <%= nota.fechaEmision.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
+                  <p class="card-text"><strong>Estado:</strong> <%= nota.estado %></p>
+                  <p class="card-text"><strong>Monto Total:</strong> $<%= nota.montoTotal.toLocaleString() %></p>
+                  <p class="card-text"><strong>Folio Doc Referencia:</strong> <%= nota.folioDocReferencia %></p>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <!-- Paginación -->
+        <% if (pagination.totalPages > 1) { %>
+          <nav aria-label="Navegación de páginas" class="mt-4">
+            <ul class="pagination justify-content-center">
+              <% if (pagination.page > 1) { %>
+                <li class="page-item">
+                  <a class="page-link" href="/notasDeCredito?page=<%= pagination.page - 1 %>&folio=<%= filters.folio || '' %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>">Anterior</a>
+                </li>
+              <% } %>
+              
+              <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+                  <a class="page-link" href="/notasDeCredito?page=<%= i %>&folio=<%= filters.folio || '' %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>"><%= i %></a>
+                </li>
+              <% } %>
+
+              <% if (pagination.page < pagination.totalPages) { %>
+                <li class="page-item">
+                  <a class="page-link" href="/notasDeCredito?page=<%= pagination.page + 1 %>&folio=<%= filters.folio || '' %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>">Siguiente</a>
+                </li>
+              <% } %>
+            </ul>
+          </nav>
         <% } %>
+      <% } else { %>
+        <p class="text-center">No hay notas de crédito disponibles. <a href="/consulta" class="btn btn-primary">Consulta facturas</a> para agregar nuevas.</p>
+      <% } %>
     </main>
 
     <%- include('partials/footer') %>
-</body>
+  </body>
 </html>

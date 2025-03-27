@@ -3,7 +3,34 @@ const ResumenMensual = require('../models/ResumenMensual');
 
 const getResumenMensual = async (req, res) => {
     try {
-        const resumenes = await ResumenMensual.find().sort({ periodo: -1 });
+        // Parámetros de paginación
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Parámetros de filtrado
+        const year = req.query.year;
+        const month = req.query.month;
+
+        // Construir query de filtrado
+        let query = {};
+        if (year) {
+            query.periodo = new RegExp(`^${year}`);
+        }
+        if (month) {
+            query.periodo = new RegExp(`${year ? year : '\\d{4}'}${month.padStart(2, '0')}`);
+        }
+
+        // Obtener total de documentos para la paginación
+        const total = await ResumenMensual.countDocuments(query);
+        const totalPages = Math.ceil(total / limit);
+
+        // Obtener resúmenes con paginación y filtros
+        const resumenes = await ResumenMensual.find(query)
+            .sort({ periodo: -1 })
+            .skip(skip)
+            .limit(limit);
+
         console.log('📢 Resumenes encontrados en MongoDB:', resumenes);
         if (!resumenes || resumenes.length === 0) {
             console.log('📢 No se encontraron resúmenes mensuales');
@@ -13,7 +40,17 @@ const getResumenMensual = async (req, res) => {
                 yearlyTotals: {},
                 yearlyComparisons: {},
                 pageStyle: 'resumenMensual',
-                error: 'No hay resúmenes mensuales disponibles.'
+                error: 'No hay resúmenes mensuales disponibles.',
+                pagination: {
+                    page,
+                    totalPages,
+                    limit,
+                    total
+                },
+                filters: {
+                    year,
+                    month
+                }
             });
         }
 
@@ -98,7 +135,17 @@ const getResumenMensual = async (req, res) => {
             yearlyTotals,
             yearlyComparisons,
             pageStyle: 'resumenMensual',
-            error: null
+            error: null,
+            pagination: {
+                page,
+                totalPages,
+                limit,
+                total
+            },
+            filters: {
+                year,
+                month
+            }
         });
     } catch (error) {
         console.error('❌ Error en getResumenMensual:', error.message);
@@ -108,7 +155,17 @@ const getResumenMensual = async (req, res) => {
             yearlyTotals: {},
             yearlyComparisons: {},
             pageStyle: 'resumenMensual',
-            error: 'Error al obtener el resumen mensual'
+            error: 'Error al obtener el resumen mensual',
+            pagination: {
+                page: 1,
+                totalPages: 1,
+                limit: 10,
+                total: 0
+            },
+            filters: {
+                year: null,
+                month: null
+            }
         });
     }
 };

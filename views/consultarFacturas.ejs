@@ -1,75 +1,77 @@
 <!-- views/consultarFacturas.ejs -->
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <%- include('partials/head') %>
     <title>Consultar Facturas - FacturasApp</title>
-</head>
-<body class="flex-column">
+  </head>
+  <body class="flex-column">
     <%- include('partials/header') %>
 
     <main class="container flex-grow">
-        <div class="title-consulta">
-            <h1>Consultar Facturas</h1>
+      <div class="title-consulta">
+        <h1>Consultar Facturas</h1>
+      </div>
+
+      <% if (!configSiiExists) { %>
+      <div class="resultado-mensaje info">
+        <p>
+          Primero debes ingresar los datos del consultante del SII. No te
+          preocupes, los datos serán almacenados y encriptados.
+        </p>
+        <a href="/configuracion" class="btn">Ir a Configuración</a>
+      </div>
+      <% } else if (!passwordSII || passwordSIIExpires <= Date.now()) { %>
+      <form id="password-form" action="/consulta" method="POST">
+        <label for="passwordSII">Contraseña SII:</label>
+        <input type="password" id="passwordSII" name="passwordSII" required />
+        <button type="submit" class="btn">Enviar</button>
+        <% if (error) { %>
+        <p style="color: red"><%= error %></p>
+        <% } %>
+      </form>
+      <% } else { %>
+      <form id="consulta-form">
+        <label for="tipoConsulta">Tipo de Consulta:</label>
+        <select id="tipoConsulta">
+          <option value="dia">Por Día</option>
+          <option value="mes">Por Mes</option>
+        </select>
+
+        <div id="fecha-container">
+          <label for="fecha">Selecciona una Fecha:</label>
+          <input type="date" id="fecha" />
         </div>
 
-        <% if (!configSiiExists) { %>
-            <div class="resultado-mensaje info">
-                <p>Primero debes ingresar los datos del consultante del SII. No te preocupes, los datos serán almacenados y encriptados.</p>
-                <a href="/configuracion" class="btn">Ir a Configuración</a>
-            </div>
-        <% } else if (!passwordSII || passwordSIIExpires <= Date.now()) { %>
-            <form id="password-form" action="/consulta" method="POST">
-                <label for="passwordSII">Contraseña SII:</label>
-                <input type="password" id="passwordSII" name="passwordSII" required />
-                <button type="submit" class="btn">Enviar</button>
-                <% if (error) { %>
-                    <p style="color: red;"><%= error %></p>
-                <% } %>
-            </form>
-        <% } else { %>
-            <form id="consulta-form">
-                <label for="tipoConsulta">Tipo de Consulta:</label>
-                <select id="tipoConsulta">
-                    <option value="dia">Por Día</option>
-                    <option value="mes">Por Mes</option>
-                </select>
+        <div id="mes-container" style="display: none">
+          <label for="mes">Mes:</label>
+          <input type="month" id="mes" />
+        </div>
 
-                <div id="fecha-container">
-                    <label for="fecha">Selecciona una Fecha:</label>
-                    <input type="date" id="fecha" />
-                </div>
+        <button type="submit" class="btn">Consultar</button>
+      </form>
 
-                <div id="mes-container" style="display: none">
-                    <label for="mes">Mes:</label>
-                    <input type="month" id="mes" />
-                </div>
+      <div id="loadingIcon" style="display: none">
+        <div class="spinner"></div>
+        <p>Procesando consulta... Esto puede tomar hasta dos minutos.</p>
+        <div id="progressBarContainer">
+          <div id="progressBar"></div>
+        </div>
+      </div>
 
-                <button type="submit" class="btn">Consultar</button>
-            </form>
-
-            <div id="loadingIcon" style="display: none">
-                <div class="spinner"></div>
-                <p>Procesando consulta... Esto puede tomar hasta un minuto.</p>
-                <div id="progressBarContainer">
-                    <div id="progressBar"></div>
-                </div>
-            </div>
-
-            <div id="mensajeExito" style="display: none">
-                ✅ Consulta realizada con éxito.
-            </div>
-            <div id="mensajeError" style="display: none">
-                ❌ Error en la consulta. Inténtalo de nuevo.
-            </div>
-            <section class="facturas" id="resultado"></section>
-        <% } %>
+      <div id="mensajeExito" style="display: none">
+        ✅ Consulta realizada con éxito.
+      </div>
+      <div id="mensajeError" style="display: none">
+        ❌ Error en la consulta. Inténtalo de nuevo.
+      </div>
+      <section class="facturas" id="resultado"></section>
+      <% } %>
     </main>
 
-    <%- include('partials/footer') %>
-
-    <% if (configSiiExists && passwordSII && passwordSIIExpires > Date.now()) { %>
-        <script src="/js/consultarFacturas.js"></script>
+    <%- include('partials/footer') %> <% if (configSiiExists && passwordSII &&
+    passwordSIIExpires > Date.now()) { %>
+    <script src="/js/consultarFacturas.js"></script>
     <% } %>
-</body>
+  </body>
 </html>

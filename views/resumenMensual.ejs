@@ -11,13 +11,51 @@
     <main class="container flex-grow">
         <header class="page-header">
             <h1>Resumen Mensual de Facturas</h1>
-            <!-- Botón "Consultar Facturas" eliminado -->
         </header>
 
         <section class="resumen-mensual">
             <% if (error) { %>
                 <div class="error-message"><%= error %></div>
             <% } %>
+
+            <!-- Filtros -->
+            <div class="filters-container mb-4">
+                <form action="/resumenMensual" method="GET" class="filters-form">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="year" class="form-label">Año</label>
+                            <select name="year" id="year" class="form-select">
+                                <option value="">Todos los años</option>
+                                <% const currentYear = new Date().getFullYear(); %>
+                                <% for(let y = currentYear; y >= currentYear - 5; y--) { %>
+                                    <option value="<%= y %>" <%= filters.year == y ? 'selected' : '' %>><%= y %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="month" class="form-label">Mes</label>
+                            <select name="month" id="month" class="form-select">
+                                <option value="">Todos los meses</option>
+                                <% const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; %>
+                                <% months.forEach((month, index) => { %>
+                                    <option value="<%= (index + 1).toString().padStart(2, '0') %>" <%= filters.month == (index + 1).toString().padStart(2, '0') ? 'selected' : '' %>><%= month %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="limit" class="form-label">Registros por página</label>
+                            <select name="limit" id="limit" class="form-select">
+                                <option value="10" <%= pagination.limit == 10 ? 'selected' : '' %>>10</option>
+                                <option value="25" <%= pagination.limit == 25 ? 'selected' : '' %>>25</option>
+                                <option value="50" <%= pagination.limit == 50 ? 'selected' : '' %>>50</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
 
             <% if (Object.keys(groupedResumenes).length > 0) { %>
                 <!-- Gráfico de tendencias -->
@@ -55,11 +93,35 @@
                         </div>
                     </div>
                 <% }) %>
+
+                <!-- Paginación -->
+                <% if (pagination.totalPages > 1) { %>
+                    <nav aria-label="Navegación de páginas" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <% if (pagination.page > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="/resumenMensual?page=<%= pagination.page - 1 %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>">Anterior</a>
+                                </li>
+                            <% } %>
+                            
+                            <% for(let i = 1; i <= pagination.totalPages; i++) { %>
+                                <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+                                    <a class="page-link" href="/resumenMensual?page=<%= i %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>"><%= i %></a>
+                                </li>
+                            <% } %>
+
+                            <% if (pagination.page < pagination.totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="/resumenMensual?page=<%= pagination.page + 1 %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>">Siguiente</a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                <% } %>
             <% } else { %>
                 <div class="no-data">
                     <p>No hay resúmenes mensuales disponibles.</p>
                     <p>¡Empieza consultando facturas para ver los datos aquí!</p>
-                    <!-- Botón "Consultar Ahora" también eliminado -->
                 </div>
             <% } %>
         </section>
