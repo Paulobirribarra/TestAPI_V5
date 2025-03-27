@@ -11,6 +11,8 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const helmet = require('helmet');
+const corsMiddleware = require('./config/cors');
+const { loginLimiter, apiLimiter, facturasLimiter } = require('./config/rateLimits');
 
 // Configurar multer para manejar solo campos de formulario (sin archivos)
 const upload = multer();
@@ -40,6 +42,14 @@ connectDB();
                 }
             }
         })); // Añadir Helmet
+
+        // Aplicar CORS
+        app.use(corsMiddleware);
+
+        // Aplicar rate limits
+        app.use('/auth/login', loginLimiter);
+        app.use('/api', apiLimiter);
+        app.use('/consultarFacturas', facturasLimiter);
 
         app.use(session({
             secret: sessionSecret,

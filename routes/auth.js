@@ -3,37 +3,67 @@ const router = express.Router();
 const passport = require('../config/Passport');
 const User = require('../models/User');
 const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { loginLimiter } = require('../config/rateLimits');
 
 // Página de login
 router.get('/login', async (req, res) => {
     try {
         const userCount = await User.countDocuments();
-        console.log('📄 Renderizando página de login, mensajes:', req.session.messages);
-        res.render('auth/login', { 
-            message: req.session.messages || null, 
+        console.log('📄 Renderizando página de login');
+        console.log('📝 Mensajes de sesión:', {
+            messages: req.session.messages,
+            success: req.session.success,
+            error: req.session.error
+        });
+        res.render('auth/login', {
+            message: req.session.messages || null,
             success: req.session.success || null,
-            showRegisterLink: userCount === 0
+            showRegisterLink: userCount === 0,
+            error: req.session.error || null
         });
         req.session.messages = null;
         req.session.success = null;
+        req.session.error = null;
     } catch (error) {
         console.log('🚨 Error al verificar usuarios:', error);
         res.status(500).send('Error interno');
     }
 });
 
-// Procesar login (sin cambios)
-router.post('/login', (req, res, next) => {
-    console.log('📩 POST recibido en /auth/login:', req.body);
+// Procesar login con rate limit
+router.post('/login', loginLimiter, (req, res, next) => {
+    console.log('📩 POST recibido en /auth/login');
+    console.log('🔑 Datos de login:', {
+        email: req.body.email,
+        ip: req.ip,
+        userAgent: req.get('user-agent')
+    });
+
+    // Verificar si hay un error de rate limit
+    if (req.session.error) {
+        return res.redirect('/auth/login');
+    }
+
     passport.authenticate('local', {
         successRedirect: '/',
         failureRedirect: '/auth/login',
         failureMessage: true
     }, (err, user, info) => {
-        if (err) return next(err);
-        if (!user) return res.redirect('/auth/login');
+        if (err) {
+            console.log('❌ Error en autenticación:', err);
+            return next(err);
+        }
+        if (!user) {
+            console.log('❌ Autenticación fallida:', info);
+            req.session.messages = info.message;
+            return res.redirect('/auth/login');
+        }
+        console.log('✅ Login exitoso para usuario:', user.email);
         req.logIn(user, (err) => {
-            if (err) return next(err);
+            if (err) {
+                console.log('🚨 Error al iniciar sesión:', err);
+                return next(err);
+            }
             return res.redirect('/');
         });
     })(req, res, next);
