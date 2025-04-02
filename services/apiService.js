@@ -2,29 +2,61 @@
 const axios = require('axios');
 const procesarFacturas = require('../config/procesarFacturas');
 const ConfigUserSii = require('../models/configUserSii');
+const { getNombreAleatorio } = require('../config/data');
+const config = require('../config/config');
 
-const API_URL = process.env.API_URL || 'https://servicios.simpleapi.cl';
+const API_URL = config.apiUrl;
 
-const fetchInvoices = async ({ fecha, mes, anio }, config, passwordSII) => {
+// Función para obtener facturas
+async function getInvoices(fecha) {
+    try {
+        console.log('🟢 Recibida consulta con parámetros:', fecha);
+
+        // Obtener la configuración del usuario
+        const configUser = await ConfigUserSii.findOne();
+        if (!configUser) {
+            throw new Error('No se encontró configuración de usuario');
+        }
+
+        // Si simulateApi es true, usar datos simulados
+        if (config.simulateApi) {
+            console.log('🔄 Usando datos simulados');
+            const facturasSimuladas = await getSimulatedInvoices(fecha);
+            console.log('✅ Datos simulados generados:', facturasSimuladas);
+            return facturasSimuladas;
+        }
+
+        // Si no es simulación, usar la API real
+        return await fetchInvoices(fecha, config, configUser.passwordSII);
+    } catch (error) {
+        console.error('❌ Error en getInvoices:', error.message);
+        throw error;
+    }
+}
+
+// Función para obtener facturas de la API real
+async function fetchInvoices(fecha, config, passwordSII) {
     const configSii = await ConfigUserSii.findOne();
     if (!configSii) {
         throw new Error('No se encontraron datos de configuración del SII');
     }
 
     let url = '';
-    if (fecha) {
-        const [anio, mes, dia] = fecha.split('-');
+    if (fecha.fecha) {
+        // Si es consulta por día específico
+        const [anio, mes, dia] = fecha.fecha.split('-');
         url = `${API_URL}/api/RCV/ventas/${dia}/${mes}/${anio}`;
-        console.log("📆 Consultando por día:", fecha, "→ URL generada:", url);
-    } else if (mes && anio) {
-        url = `${API_URL}/api/RCV/ventas/${mes}/${anio}`;
-        console.log("📅 Consultando por mes:", mes, anio, "→ URL generada:", url);
+        console.log("📆 Consultando por día:", fecha.fecha, "→ URL generada:", url);
+    } else if (fecha.mes && fecha.anio) {
+        // Si es consulta por mes
+        url = `${API_URL}/api/RCV/ventas/${fecha.mes}/${fecha.anio}`;
+        console.log("📅 Consultando por mes:", fecha.mes, fecha.anio, "→ URL generada:", url);
     } else {
         throw new Error('Parámetros de consulta inválidos');
     }
 
-    const finalApiUser = config?.apiUser || process.env.USER_API;
-    const finalApiKey = config?.apiKey || process.env.PASSWORD_API;
+    const finalApiUser = config.apiUser;
+    const finalApiKey = config.apiKey;
 
     const headers = {
         'Content-Type': 'application/json',
@@ -33,7 +65,7 @@ const fetchInvoices = async ({ fecha, mes, anio }, config, passwordSII) => {
 
     const body = {
         RutUsuario: configSii.rutUsuario,
-        PasswordSII: passwordSII, // Usar el valor plano de la sesión
+        PasswordSII: passwordSII,
         RutEmpresa: configSii.rutEmpresa,
         Ambiente: configSii.ambiente,
     };
@@ -66,6 +98,75 @@ const fetchInvoices = async ({ fecha, mes, anio }, config, passwordSII) => {
         }
         throw error;
     }
-};
+}
 
-module.exports = { fetchInvoices };
+// Función para simular respuesta de la API
+async function getSimulatedInvoices(fecha) {
+    try {
+        console.log('🔄 Generando datos simulados para:', fecha);
+
+        // Generar datos simulados
+        const facturasSimuladas = [];
+        const numFacturas = Math.floor(Math.random() * 10) + 5; // Entre 5 y 15 facturas
+
+        // Determinar el formato de fecha y generar fechas aleatorias dentro del mes
+        let fechasEmision = [];
+        let periodo;
+        if (fecha.mes && fecha.anio) {
+            // Si es consulta por mes, generar fechas aleatorias dentro del mes
+            const mes = parseInt(fecha.mes);
+            const anio = parseInt(fecha.anio);
+            const diasEnMes = new Date(anio, mes, 0).getDate();
+            periodo = `${anio}${String(mes).padStart(2, '0')}`;
+
+            // Generar fechas aleatorias para cada factura
+            for (let i = 0; i < numFacturas; i++) {
+                const dia = Math.floor(Math.random() * diasEnMes) + 1;
+                fechasEmision.push(`${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`);
+            }
+        } else if (fecha.fecha) {
+            // Si es consulta por día específico, usar esa fecha
+            const [anio, mes] = fecha.fecha.split('-');
+            periodo = `${anio}${mes}`;
+            fechasEmision = Array(numFacturas).fill(fecha.fecha);
+        } else {
+            throw new Error('Formato de fecha no válido');
+        }
+
+        // Generar facturas con las fechas calculadas
+        for (let i = 0; i < numFacturas; i++) {
+            const montoNeto = Math.floor(Math.random() * 1000000) + 10000; // Entre 10,000 y 1,010,000
+            const montoIva = Math.floor(montoNeto * 0.19);
+            const montoTotal = montoNeto + montoIva;
+
+            facturasSimuladas.push({
+                tipoDTE: '33',
+                folio: Math.floor(Math.random() * 1000) + 1,
+                fechaEmision: fechasEmision[i],
+                montoNeto: montoNeto,
+                montoIva: montoIva,
+                montoTotal: montoTotal,
+                estado: Math.random() > 0.5 ? 'PAGADO' : 'PENDIENTE',
+                razonSocial: getNombreAleatorio(),
+                rut: Math.floor(Math.random() * 90000000) + 10000000 + '-' + Math.floor(Math.random() * 9) + 1,
+                periodo: periodo,
+                tipoDTENumber: 33,
+                tipoDTEString: 'Factura Electrónica',
+                rutCliente: Math.floor(Math.random() * 90000000) + 10000000 + '-' + Math.floor(Math.random() * 9) + 1,
+                montoIVA: montoIva,
+                montoIVARecuperable: montoIva,
+                dia: parseInt(fechasEmision[i].split('-')[2]),
+                mes: parseInt(fechasEmision[i].split('-')[1]),
+                anio: parseInt(fechasEmision[i].split('-')[0])
+            });
+        }
+
+        return facturasSimuladas;
+    } catch (error) {
+        console.error('❌ Error al generar datos simulados:', error.message);
+        throw error;
+    }
+}
+
+module.exports = { getInvoices, fetchInvoices };
+

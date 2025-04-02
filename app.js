@@ -1,7 +1,7 @@
 // app.js
-const { app } = require('./config/server');
-const connectDB = require('./config/database');
 const express = require('express');
+const { configureServer, PORT } = require('./config/server');
+const connectDB = require('./config/database');
 const session = require('express-session');
 const passport = require('./config/Passport');
 const { isAuthenticated, isAdmin } = require('./middleware/auth');
@@ -13,6 +13,10 @@ const fs = require('fs');
 const helmet = require('helmet');
 const corsMiddleware = require('./config/cors');
 const { loginLimiter, apiLimiter, facturasLimiter } = require('./config/rateLimits');
+const facturasRoutes = require('./routes/facturasRoutes');
+
+// Crear la aplicación Express
+const app = express();
 
 // Configurar multer para manejar solo campos de formulario (sin archivos)
 const upload = multer();
@@ -32,6 +36,9 @@ connectDB();
     try {
         const config = await Config.findOne() || await new Config({ apiKey: 'default-key', apiUser: 'default-user' }).save();
         const sessionSecret = config.sessionSecret;
+
+        // Configurar el servidor
+        configureServer(app);
 
         app.use(helmet({
             contentSecurityPolicy: {
@@ -63,10 +70,7 @@ connectDB();
             }
         }));
 
-        app.use(express.json());
-        app.use(express.urlencoded({ extended: true }));
         app.use(upload.none());
-        app.use('/', express.static('public'));
         app.use(passport.initialize());
         app.use(passport.session());
 
@@ -91,6 +95,7 @@ connectDB();
         app.use('/configuracion', configRoutes);
         app.use('/auth', authRoutes);
         app.use('/resumenMensual', resumenMensualRoutes);
+        app.use('/facturas', facturasRoutes);
         app.use(require('./middleware/errorHandler'));
 
         const options = {
@@ -98,18 +103,23 @@ connectDB();
             cert: fs.readFileSync('config/cert.pem')
         };
 
-        https.createServer(options, app).listen(3000, () => {
-            console.log('Servidor HTTPS corriendo en https://localhost:3000');
+        // Crear servidor HTTPS
+        const httpsServer = https.createServer(options, app);
+        httpsServer.listen(PORT, () => {
+            console.log(`Servidor HTTPS corriendo en https://localhost:${PORT}`);
         });
 
-        http.createServer((req, res) => {
-            res.writeHead(301, { Location: `https://localhost:3000${req.url}` });
+        // Crear servidor HTTP para redirigir a HTTPS
+        const httpServer = http.createServer((req, res) => {
+            res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
             res.end();
-        }).listen(80, () => {
+        });
+        httpServer.listen(80, () => {
             console.log('Servidor HTTP redirigiendo a HTTPS en http://localhost:80');
         });
+
     } catch (error) {
-        console.error('Error al iniciar la aplicación:', error);
+        console.error('Error al iniciar el servidor:', error);
         process.exit(1);
     }
 })();

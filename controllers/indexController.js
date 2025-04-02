@@ -8,7 +8,13 @@ const getHomePage = async (req, res) => {
         const { busqueda, estado, fecha, cliente } = req.query;
 
         // Filtro base para facturas (tipo 33)
-        let query = { tipoDTENumber: 33 };
+        let query = {
+            $or: [
+                { tipoDTENumber: 33 },
+                { tipoDTE: '33' },
+                { ingresadoManualmente: true }
+            ]
+        };
 
         // Aplicar filtros
         if (busqueda) {
@@ -82,7 +88,17 @@ const getHomePage = async (req, res) => {
         const filtroMesQuery = filtroMes ? { mes: parseInt(filtroMes) } : {};
         const filtroAnioQuery = filtroAnio ? { anio: parseInt(filtroAnio) } : {};
         const totalFacturasMes = await Facturas.aggregate([
-            { $match: { tipoDTENumber: 33, ...filtroMesQuery, ...filtroAnioQuery } },
+            {
+                $match: {
+                    $or: [
+                        { tipoDTENumber: 33 },
+                        { tipoDTE: '33' },
+                        { ingresadoManualmente: true }
+                    ],
+                    ...filtroMesQuery,
+                    ...filtroAnioQuery
+                }
+            },
             { $group: { _id: null, total: { $sum: "$montoTotal" } } }
         ]);
         const totalNotasCreditoMes = await Facturas.aggregate([

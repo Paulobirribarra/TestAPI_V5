@@ -24,7 +24,8 @@ const getInvoices = async (req, res) => {
             throw new Error('Parámetros de consulta inválidos');
         }
 
-        const facturas = await apiService.fetchInvoices(params, config, passwordSII);
+        // Usar getInvoices en lugar de fetchInvoices
+        const facturas = await apiService.getInvoices(params);
         const saveResult = await invoiceService.saveInvoices(facturas);
 
         let periodo;

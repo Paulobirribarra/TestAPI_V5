@@ -31,41 +31,45 @@
         <% } %>
       </form>
       <% } else { %>
-      <form id="consulta-form">
-        <label for="tipoConsulta">Tipo de Consulta:</label>
-        <select id="tipoConsulta">
-          <option value="dia">Por Día</option>
-          <option value="mes">Por Mes</option>
-        </select>
+      <div class="consulta-container">
+        <form id="consulta-form">
+          <div class="form-group">
+            <label for="tipoConsulta">Tipo de Consulta:</label>
+            <select id="tipoConsulta" class="form-control">
+              <option value="dia">Por Día</option>
+              <option value="mes">Por Mes</option>
+            </select>
+          </div>
 
-        <div id="fecha-container">
-          <label for="fecha">Selecciona una Fecha:</label>
-          <input type="date" id="fecha" />
+          <div id="fecha-container" class="form-group">
+            <label for="fecha">Selecciona una Fecha:</label>
+            <input type="date" id="fecha" class="form-control" />
+          </div>
+
+          <div id="mes-container" class="form-group" style="display: none">
+            <label for="mes">Mes:</label>
+            <input type="month" id="mes" class="form-control" />
+          </div>
+
+          <button type="submit" class="btn btn-primary">Consultar</button>
+        </form>
+
+        <div id="loadingIcon" style="display: none">
+          <div class="spinner"></div>
+          <p>Procesando consulta... Esto puede tomar hasta dos minutos.</p>
+          <div id="progressBarContainer">
+            <div id="progressBar"></div>
+          </div>
         </div>
 
-        <div id="mes-container" style="display: none">
-          <label for="mes">Mes:</label>
-          <input type="month" id="mes" />
+        <div id="mensajeExito" style="display: none">
+          ✅ Consulta realizada con éxito.
         </div>
-
-        <button type="submit" class="btn">Consultar</button>
-      </form>
-
-      <div id="loadingIcon" style="display: none">
-        <div class="spinner"></div>
-        <p>Procesando consulta... Esto puede tomar hasta dos minutos.</p>
-        <div id="progressBarContainer">
-          <div id="progressBar"></div>
+        <div id="mensajeError" style="display: none">
+          ❌ Error en la consulta. Inténtalo de nuevo.
         </div>
+        <section class="facturas" id="resultado"></section>
       </div>
-
-      <div id="mensajeExito" style="display: none">
-        ✅ Consulta realizada con éxito.
-      </div>
-      <div id="mensajeError" style="display: none">
-        ❌ Error en la consulta. Inténtalo de nuevo.
-      </div>
-      <section class="facturas" id="resultado"></section>
       <% } %>
     </main>
 

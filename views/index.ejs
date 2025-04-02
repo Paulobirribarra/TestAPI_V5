@@ -1,76 +1,120 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <%- include('partials/head') %>
     <title>Listado de Facturas</title>
-</head>
-<body>
+  </head>
+  <body>
     <%- include('partials/header') %>
 
     <main class="container py-4">
-        <h1 class="text-center mb-4">Listado de Facturas</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-center mb-0">Listado de Facturas</h1>
+        <div class="admin-actions">
+          <div class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="adminDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="fas fa-cog"></i> Acciones Administrativas
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+              <li>
+                <a class="dropdown-item" href="/facturas/add">
+                  <i class="fas fa-plus"></i> Agregar Factura Manual
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
-        <!-- Mostrar mensaje de éxito -->
-        <% if (success) { %>
-            <p class="success mb-3 text-center"><%= success %></p>
-        <% } %>
+      <!-- Mostrar mensaje de éxito -->
+      <% if (success) { %>
+      <p class="success mb-3 text-center"><%= success %></p>
+      <% } %>
 
-        <!-- Incluir sección de filtros -->
-        <%- include('partials/filters') %>
+      <!-- Incluir sección de filtros -->
+      <%- include('partials/filters') %>
 
-        <section class="facturas">
-            <% if (facturas.length > 0) { %>
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <% facturas.forEach(factura => { %>
-                        <div class="col">
-                            <%- include('partials/card', { factura: factura }) %>
-                        </div>
-                    <% }) %>
-                </div>
+      <section class="facturas">
+        <% if (facturas.length > 0) { %>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <% facturas.forEach(factura => { %>
+          <div class="col">
+            <%- include('partials/card', { factura: factura }) %>
+          </div>
+          <% }) %>
+        </div>
 
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center mt-4">
-                        <% if (currentPage > 1) { %>
-                            <li class="page-item">
-                                <a class="page-link" href="/?page=1&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>">Primera</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="/?page=<%= currentPage - 1 %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>">Anterior</a>
-                            </li>
-                        <% } else { %>
-                            <li class="page-item disabled">
-                                <span class="page-link">Primera</span>
-                            </li>
-                            <li class="page-item disabled">
-                                <span class="page-link">Anterior</span>
-                            </li>
-                        <% } %>
-                        <li class="page-item disabled">
-                            <span class="page-link">Página <%= currentPage %> de <%= totalPages %></span>
-                        </li>
-                        <% if (currentPage < totalPages) { %>
-                            <li class="page-item">
-                                <a class="page-link" href="/?page=<%= currentPage + 1 %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>">Siguiente</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="/?page=<%= totalPages %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>">Última</a>
-                            </li>
-                        <% } else if (totalPages > 1) { %>
-                            <li class="page-item disabled">
-                                <span class="page-link">Siguiente</span>
-                            </li>
-                            <li class="page-item disabled">
-                                <span class="page-link">Última</span>
-                            </li>
-                        <% } %>
-                    </ul>
-                </nav>
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mt-4">
+            <% if (currentPage > 1) { %>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="/?page=1&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>"
+                >Primera</a
+              >
+            </li>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="/?page=<%= currentPage - 1 %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>"
+                >Anterior</a
+              >
+            </li>
             <% } else { %>
-                <p class="text-center">No hay facturas disponibles. <a href="/consulta" class="btn btn-primary">Consulta facturas</a> para agregar nuevas.</p>
+            <li class="page-item disabled">
+              <span class="page-link">Primera</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">Anterior</span>
+            </li>
             <% } %>
-        </section>
+            <li class="page-item disabled">
+              <span class="page-link"
+                >Página <%= currentPage %> de <%= totalPages %></span
+              >
+            </li>
+            <% if (currentPage < totalPages) { %>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="/?page=<%= currentPage + 1 %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>"
+                >Siguiente</a
+              >
+            </li>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="/?page=<%= totalPages %>&busqueda=<%= filtroBusqueda || '' %>&cliente=<%= filtroCliente || '' %>&estado=<%= filtroEstado || '' %>&fecha=<%= filtroFecha || '' %>"
+                >Última</a
+              >
+            </li>
+            <% } else if (totalPages > 1) { %>
+            <li class="page-item disabled">
+              <span class="page-link">Siguiente</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">Última</span>
+            </li>
+            <% } %>
+          </ul>
+        </nav>
+        <% } else { %>
+        <p class="text-center">
+          No hay facturas disponibles.
+          <a href="/consulta" class="btn btn-primary">Consulta facturas</a> para
+          agregar nuevas.
+        </p>
+        <% } %>
+      </section>
     </main>
 
     <%- include('partials/footer') %>
-</body>
+  </body>
 </html>

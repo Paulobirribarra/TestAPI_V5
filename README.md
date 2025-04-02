@@ -65,29 +65,27 @@ El proyecto utiliza las siguientes dependencias:
 
 ### Dependencias de producción
 
-- **axios**: Para hacer solicitudes HTTP a la API externa.
-- **bcryptjs**: Para encriptar contraseñas y datos sensibles.
-- **chart.js**: Para generar gráficos interactivos en la página de resumen mensual.
-- **cors**: Para manejar políticas de CORS en el servidor.
-- **ejs**: Motor de plantillas para renderizar vistas en el frontend.
-- **express**: Framework para construir la aplicación web.
-- **express-rate-limit**: Para implementar límites de tasa y prevenir ataques de fuerza bruta.
-- **express-session**: Para gestionar sesiones de usuario.
-- **helmet**: Para añadir seguridad a las cabeceras HTTP.
-- **mongoose**: Para interactuar con la base de datos MongoDB.
-- **mongoose-paginate-v2**: Para agregar paginación a las consultas de MongoDB.
-- **morgan**: Para registrar las solicitudes HTTP en la consola.
-- **multer**: Para manejar la carga de archivos (si se implementa carga de archivos).
-- **passport**: Para implementar autenticación de usuarios.
-- **passport-local**: Estrategia de autenticación local para Passport.
-
-#### Nota sobre `dotenv`
-
-Aunque `dotenv` aparece en las dependencias del `package.json`, no se utiliza en el proyecto. Las variables de entorno se manejan directamente en los archivos de configuración con valores por defecto, y los datos sensibles se ingresan a través de la interfaz de usuario.
+- **axios** (^1.8.2): Para hacer solicitudes HTTP a la API externa
+- **bcryptjs** (^3.0.2): Para encriptar contraseñas y datos sensibles
+- **chart.js** (^4.4.8): Para generar gráficos interactivos en la página de resumen mensual
+- **cors** (^2.8.5): Para manejar políticas de CORS en el servidor
+- **date-fns** (^4.1.0): Para manipulación y formateo de fechas
+- **ejs** (^3.1.10): Motor de plantillas para renderizar vistas en el frontend
+- **express** (^4.21.2): Framework para construir la aplicación web
+- **express-rate-limit** (^7.5.0): Para implementar límites de tasa y prevenir ataques de fuerza bruta
+- **express-session** (^1.18.1): Para gestionar sesiones de usuario
+- **express-validator** (^7.2.1): Para validación de datos en formularios
+- **helmet** (^8.0.0): Para añadir seguridad a las cabeceras HTTP
+- **mongoose** (^8.12.1): Para interactuar con la base de datos MongoDB
+- **mongoose-paginate-v2** (^1.9.0): Para agregar paginación a las consultas de MongoDB
+- **morgan** (^1.10.0): Para registrar las solicitudes HTTP en la consola
+- **multer** (^1.4.5-lts.1): Para manejar la carga de archivos
+- **passport** (^0.7.0): Para implementar autenticación de usuarios
+- **passport-local** (^1.0.0): Estrategia de autenticación local para Passport
 
 ### Dependencias de desarrollo
 
-- **nodemon**: Para reiniciar automáticamente el servidor durante el desarrollo.
+- **nodemon** (^3.1.9): Para reiniciar automáticamente el servidor durante el desarrollo
 
 ### Configuración de Seguridad
 
@@ -118,7 +116,11 @@ cd TestAPI_V5
 npm install
 ```
 
-3. Generar Certificados Autofirmados
+3. Configuración de la base de datos
+   La aplicación usa MongoDB con la URL por defecto: `mongodb://localhost:27017/facturasDB`
+   Si necesitas cambiar esta URL, modifica el archivo `config/database.js`
+
+4. Generar Certificados Autofirmados
 
 ## Configuración de HTTPS
 

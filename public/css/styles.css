@@ -83,3 +83,170 @@
 .detalles.visible {
     transform: translateY(0);
 }
+
+/* Estilos para el formulario de agregar facturas */
+.formulario-factura {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.formulario-factura .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    padding: 15px 20px;
+    border-radius: 8px 8px 0 0;
+}
+
+.formulario-factura .card-title {
+    color: #007BFF;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.formulario-factura .form-label {
+    color: #495057;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.formulario-factura .form-control,
+.formulario-factura .form-select {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 10px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.formulario-factura .form-control:focus,
+.formulario-factura .form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.formulario-factura .btn-primary {
+    background-color: #007BFF;
+    border: none;
+    padding: 12px 25px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.formulario-factura .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.formulario-factura .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    padding: 12px 25px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.formulario-factura .btn-secondary:hover {
+    background-color: #545b62;
+}
+
+.formulario-factura .alert {
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.formulario-factura .alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.formulario-factura .alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Estilos para la validación de campos */
+.formulario-factura .form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linecap='round' d='M6 3.75v1.5m0 4.5h1.5m-3 0h1.5'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(.375em + .1875rem) center;
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+}
+
+.formulario-factura .invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: .875em;
+    color: #dc3545;
+}
+
+.formulario-factura .form-control.is-invalid~.invalid-feedback {
+    display: block;
+}
+
+/* Estilos para campos de monto */
+.formulario-factura .monto-input {
+    position: relative;
+}
+
+.formulario-factura .monto-input::before {
+    content: '$';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.formulario-factura .monto-input input {
+    padding-left: 25px;
+}
+
+/* Estilos para el botón de volver */
+.formulario-factura .btn-volver {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Estilos para acciones administrativas */
+.admin-actions {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.admin-actions .dropdown-toggle {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.admin-actions .dropdown-menu {
+    min-width: 200px;
+    padding: 0.5rem 0;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.admin-actions .dropdown-item {
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-actions .dropdown-item i {
+    width: 1.2rem;
+    text-align: center;
+}
+
+.admin-actions .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
