@@ -53,11 +53,7 @@ connectDB();
         // Aplicar CORS
         app.use(corsMiddleware);
 
-        // Aplicar rate limits
-        app.use('/auth/login', loginLimiter);
-        app.use('/api', apiLimiter);
-        app.use('/consultarFacturas', facturasLimiter);
-
+        // Configurar sesión antes de los rate limits
         app.use(session({
             secret: sessionSecret,
             resave: false,
@@ -69,6 +65,11 @@ connectDB();
                 sameSite: 'strict'
             }
         }));
+
+        // Aplicar rate limits después de la sesión
+        app.use('/auth/login', loginLimiter);
+        app.use('/api', apiLimiter);
+        app.use('/consultarFacturas', facturasLimiter);
 
         app.use(upload.none());
         app.use(passport.initialize());

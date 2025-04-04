@@ -2,7 +2,8 @@
 const express = require('express');
 const path = require('path');
 
-const PORT = 3000;
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 const configureServer = (app) => {
     // Configurar el motor de vistas

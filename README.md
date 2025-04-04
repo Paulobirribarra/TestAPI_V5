@@ -1,6 +1,10 @@
 # Facturas APP
 
-Este aplicación WEB fué diseñado para ser presentada como proyecto de título. Es una aplicación que gestiona facturas, notas de crédito y entrega un resumen de ventas. Su función principal es realizar consultas a una API externa llamada simple Api. Esta tiene end points específicos como: "consultas por día" y "consultas por mes". Tiene apartado de configuración para ingresar los datos del consultante (previamente habilitado en el SII). Luego re realizar correctamente una consulta, almacena los datos (JSON) en una base de datos local Mongo. La consulta externa solo sirve para poblar la base local. Admás,permite a los usuarios visualizar y editar información relacionada con las facturas. Como campos de contacto, correo y metodos de pago. Tiene rutas protegidas con passport y express-session. La clave para realizar consultas se pide cada 1 hora y cada vez que inicia sesión se resetea el timer.
+Esta aplicación WEB fue diseñada para ser presentada como proyecto de título. Es una aplicación que gestiona facturas, notas de crédito y entrega un resumen de ventas. Su función principal es realizar consultas a una API externa llamada SimpleAPI. Esta tiene endpoints específicos como: "consultas por día" y "consultas por mes".
+
+Tiene un apartado de configuración para ingresar los datos del consultante (previamente habilitado en el SII). Luego de realizar correctamente una consulta, almacena los datos (JSON) en una base de datos local MongoDB. La consulta externa solo sirve para poblar la base local. Además, permite a los usuarios visualizar y editar información relacionada con las facturas, como campos de contacto, correo y métodos de pago.
+
+Tiene rutas protegidas con Passport y Express-session. La clave para realizar consultas se solicita cada 2 horas y cada vez que se inicia sesión se resetea el temporizador.
 
 ## Características de Seguridad
 
@@ -20,10 +24,8 @@ Este aplicación WEB fué diseñado para ser presentada como proyecto de título
     ├── README.md
     ├── app.js                 # Punto de entrada de la aplicación
     ├── config/               # Configuraciones
-    │   ├── BDConection.js    # Conexión a MongoDB
     │   ├── database.js       # Configuración de la base de datos
     │   ├── Passport.js       # Configuración de autenticación
-    │   ├── procesarFacturas.js # Lógica de procesamiento de facturas
     │   ├── server.js         # Configuración del servidor
     │   ├── cors.js           # Configuración de CORS
     │   └── rateLimits.js     # Configuración de límites de tasa
@@ -42,6 +44,9 @@ Este aplicación WEB fué diseñado para ser presentada como proyecto de título
     │   ├── Facturas.js      # Modelo de facturas
     │   ├── ResumenMensual.js # Modelo de resumen mensual
     │   └── User.js          # Modelo de usuario
+    ├── services/            # Servicios de la aplicación
+    │   ├── apiService.js    # Servicio de API externa
+    │   └── invoiceService.js # Servicio de facturas
     ├── public/              # Archivos estáticos
     │   ├── css/            # Estilos CSS
     │   ├── js/             # Scripts JavaScript
@@ -193,14 +198,6 @@ http://localhost:3000
 ## Nota Académica
 
 Este proyecto fue desarrollado como parte de un trabajo de título académico. El código y la documentación están disponibles para fines educativos y de investigación. Para cualquier consulta sobre el proyecto, por favor contactar al autor.
-
-## Requisitos del Sistema
-
-- Node.js v14 o superior
-- MongoDB v4.4 o superior
-- Navegador web moderno con soporte para JavaScript ES6+
-- Espacio en disco: mínimo 1GB (dependiendo del volumen de datos)
-- Memoria RAM: mínimo 4GB recomendado
 
 ## Troubleshooting
 

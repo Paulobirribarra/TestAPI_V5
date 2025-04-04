@@ -7,20 +7,15 @@ const loginLimiter = rateLimit({
     message: 'Demasiados intentos de inicio de sesión. Por favor, intente nuevamente en 15 minutos.',
     standardHeaders: true,
     legacyHeaders: false,
-    skip: (req) => {
-        // Solo aplicar a la ruta de login
-        return req.path !== '/auth/login';
-    },
     handler: (req, res) => {
         console.log('🚫 Rate limit alcanzado para IP:', req.ip);
         console.log('📊 Intentos restantes:', res.getHeader('X-RateLimit-Remaining'));
         console.log('⏰ Tiempo de espera restante:', res.getHeader('X-RateLimit-Reset'));
 
-        // Guardar el mensaje de error en la sesión
-        req.session.error = 'Demasiados intentos de inicio de sesión. Por favor, intente nuevamente en 15 minutos.';
-
-        // Redirigir a la página de login
-        return res.redirect('/auth/login');
+        // Devolver un error 429 con mensaje
+        res.status(429).json({
+            error: 'Demasiados intentos de inicio de sesión. Por favor, intente nuevamente en 15 minutos.'
+        });
     }
 });
 
