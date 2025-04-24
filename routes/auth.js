@@ -1,3 +1,4 @@
+//routes/auth.js
 const express = require('express');
 const router = express.Router();
 const passport = require('../config/Passport');
@@ -74,10 +75,10 @@ router.get('/register', async (req, res) => {
     try {
         const userCount = await User.countDocuments();
         if (userCount === 0) {
-            return res.render('auth/register', { error: null, isFirstUser: true, name: '', email: '', role: 'admin' });
+            return res.render('auth/register', { errors: {}, isFirstUser: true, name: '', email: '', role: 'admin' });
         }
         isAuthenticated(req, res, () => isAdmin(req, res, () => {
-            res.render('auth/register', { error: null, isFirstUser: false, name: '', email: '', role: 'lector' });
+            res.render('auth/register', { errors: {}, isFirstUser: false, name: '', email: '', role: 'lector' });
         }));
     } catch (error) {
         console.log('🚨 Error al verificar usuarios:', error);
@@ -96,7 +97,7 @@ router.post('/register', async (req, res) => {
     } catch (error) {
         console.log('🚨 Error al contar usuarios:', error);
         return res.render('auth/register', {
-            error: 'Error al verificar usuarios. Intenta nuevamente.',
+            errors: { general: 'Error al verificar usuarios. Intenta nuevamente.' },
             isFirstUser: false,
             name: name || '',
             email: email || '',
@@ -104,23 +105,41 @@ router.post('/register', async (req, res) => {
         });
     }
 
+    // Crear objeto para almacenar errores
+    const errors = {};
+
     // Validar nombre (solo letras y espacios, 2-50 caracteres)
     const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}$/;
     if (!nameRegex.test(name)) {
-        return res.render('auth/register', {
-            error: 'El nombre debe tener 2-50 caracteres y solo letras o espacios.',
-            isFirstUser: userCount === 0,
-            name: name || '',
-            email: email || '',
-            role: role || (userCount === 0 ? 'admin' : 'lector')
-        });
+        errors.name = 'El nombre debe tener 2-50 caracteres y solo letras o espacios.';
     }
 
     // Validar email (básico)
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (!emailRegex.test(email)) {
+        errors.email = 'Por favor, ingresa un correo electrónico válido.';
+    }
+
+    // Validar contraseña (mínimo 8 caracteres)
+    if (!password || password.length < 8) {
+        errors.password = 'La contraseña debe tener al menos 8 caracteres.';
+    }
+
+    // Verificar si el email ya está registrado
+    try {
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        if (existingUser) {
+            errors.email = 'El correo ya está registrado.';
+        }
+    } catch (error) {
+        console.log('🚨 Error al verificar email:', error);
+        errors.email = 'Error al verificar el email. Intenta nuevamente.';
+    }
+
+    // Si hay errores, renderizar la página con los errores
+    if (Object.keys(errors).length > 0) {
         return res.render('auth/register', {
-            error: 'Por favor, ingresa un correo electrónico válido.',
+            errors,
             isFirstUser: userCount === 0,
             name: name || '',
             email: email || '',
@@ -151,12 +170,15 @@ router.post('/register', async (req, res) => {
             errorMessage = Object.values(error.errors)
                 .map(err => err.message)
                 .join(', ');
+            errors.general = errorMessage;
         } else if (error.code === 11000) {
-            errorMessage = 'El correo ya está registrado.';
+            errors.email = 'El correo ya está registrado.';
+        } else {
+            errors.general = errorMessage;
         }
 
         return res.render('auth/register', {
-            error: errorMessage,
+            errors,
             isFirstUser: userCount === 0,
             name: name || '',
             email: email || '',

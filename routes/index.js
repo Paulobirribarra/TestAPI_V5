@@ -8,6 +8,9 @@ const ConfigUserSii = require('../models/configUserSii');
 
 router.get('/', isAuthenticated, indexController.getHomePage);
 
+router.get('/agregarFactura', isAuthenticated, isAdmin, indexController.getAgregarFactura);
+router.post('/agregarFactura', isAuthenticated, isAdmin, indexController.postAgregarFactura);
+
 router.post('/factura/update/:id', isAuthenticated, isAdmin, async (req, res) => {
     const { id } = req.params;
     const { pagada, metodoDePago, comentario, fechaDePago, contacto, correoContacto, sector } = req.body;

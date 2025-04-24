@@ -1,4 +1,3 @@
-// app.js
 const { app } = require('./config/server');
 const connectDB = require('./config/database');
 const express = require('express');
@@ -62,6 +61,14 @@ connectDB();
                 sameSite: 'strict'
             }
         }));
+
+        // Middleware para inicializar propiedades de la sesión
+        app.use((req, res, next) => {
+            if (!req.session.messages) req.session.messages = null;
+            if (!req.session.success) req.session.success = null;
+            if (!req.session.error) req.session.error = null;
+            next();
+        });
 
         app.use(express.json());
         app.use(express.urlencoded({ extended: true }));

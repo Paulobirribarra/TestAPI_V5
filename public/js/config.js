@@ -1,3 +1,4 @@
+//public/js/config.js
 document.addEventListener('DOMContentLoaded', () => {
     console.log('📜 Script config.js cargado');
 
@@ -16,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function validaRut(rut) {
+        // Verificar longitud
+        if (rut.length < 9 || rut.length > 10) {
+            return false;
+        }
+
         if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) return false;
         const [digits, dv] = rut.split('-');
         let sum = 0;
@@ -114,6 +120,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('❌ Error en fetch config SII:', error);
                 document.getElementById('mensajeError').style.display = 'block';
                 document.getElementById('mensajeExito').style.display = 'none';
+            }
+        });
+    }
+
+    const agregarFacturaForm = document.getElementById('agregarFacturaForm');
+    if (agregarFacturaForm) {
+        console.log('✅ Formulario agregarFacturaForm encontrado');
+        agregarFacturaForm.addEventListener('submit', (event) => {
+            let isValid = true;
+
+            // Validar folio
+            const folioInput = document.getElementById('folio');
+            const folioValue = parseInt(folioInput.value);
+            if (isNaN(folioValue) || folioValue <= 0) {
+                folioInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                folioInput.classList.remove('is-invalid');
+            }
+
+            // Validar montoTotal
+            const montoTotalInput = document.getElementById('montoTotal');
+            const montoTotalValue = parseFloat(montoTotalInput.value);
+            if (isNaN(montoTotalValue) || montoTotalValue <= 0) {
+                montoTotalInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                montoTotalInput.classList.remove('is-invalid');
+            }
+
+            // Validar RUT
+            const rutInput = document.getElementById('rutCliente');
+            const rutValue = rutInput.value;
+            if (!validaRut(rutValue)) {
+                rutInput.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                rutInput.classList.remove('is-invalid');
+            }
+
+            if (!isValid) {
+                event.preventDefault();
             }
         });
     }

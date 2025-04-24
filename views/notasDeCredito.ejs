@@ -75,7 +75,7 @@
                   <p class="card-text"><strong>RUT Cliente:</strong> <%= nota.rutCliente %></p>
                   <p class="card-text"><strong>Tipo de Documento:</strong> <%= nota.tipoDTEString %></p>
                   <p class="card-text"><strong>Fecha de Emisión:</strong> <%= nota.fechaEmision.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
-                  <p class="card-text"><strong>Estado:</strong> <%= nota.estado %></p>
+                  <p class="card-text"><strong>Estado:</strong> Anulada</p>
                   <p class="card-text"><strong>Monto Total:</strong> $<%= nota.montoTotal.toLocaleString() %></p>
                   <p class="card-text"><strong>Folio Doc Referencia:</strong> <%= nota.folioDocReferencia %></p>
                 </div>

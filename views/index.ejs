@@ -1,3 +1,4 @@
+<!-- views/index.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,6 +18,30 @@
 
         <!-- Incluir sección de filtros -->
         <%- include('partials/filters') %>
+
+        <!-- Menú desplegable de acciones administrativas (visible solo para admins) -->
+        <% if (user && user.role === 'admin') { %>
+            <div class="admin-actions mb-3 text-end">
+                <div class="dropdown">
+                    <button
+                        class="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        id="adminDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        <i class="fas fa-cog"></i> Acciones Administrativas
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                        <li>
+                            <a class="dropdown-item" href="/agregarFactura">
+                                <i class="fas fa-plus"></i> Agregar Factura Manual
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        <% } %>
 
         <section class="facturas">
             <% if (facturas.length > 0) { %>

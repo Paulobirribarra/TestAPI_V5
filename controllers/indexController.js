@@ -1,3 +1,4 @@
+//controllers/indexController.ejs
 const Facturas = require('../models/Facturas');
 
 const getHomePage = async (req, res) => {
@@ -14,10 +15,8 @@ const getHomePage = async (req, res) => {
         if (busqueda) {
             const busquedaNum = parseInt(busqueda);
             if (!isNaN(busquedaNum)) {
-                // Si es un número, buscar en folio
                 query.folio = busquedaNum;
             } else {
-                // Si no es un número, buscar en correoContacto y contacto
                 query.$or = [
                     { correoContacto: { $regex: new RegExp(busqueda, 'i') } },
                     { contacto: { $regex: new RegExp(busqueda, 'i') } }
@@ -31,7 +30,6 @@ const getHomePage = async (req, res) => {
             query.pagada = false;
         }
 
-        // Procesar el filtro de fecha (mes/año)
         let filtroMes = '';
         let filtroAnio = '';
         if (fecha) {
@@ -55,7 +53,6 @@ const getHomePage = async (req, res) => {
             ];
         }
 
-        // Excluir facturas anuladas por notas de crédito
         const notasDeCredito = await Facturas.find({ tipoDTENumber: 61 }, { folioDocReferencia: 1 });
         const foliosAnulados = notasDeCredito.map(nc => nc.folioDocReferencia).filter(Boolean);
 
@@ -66,7 +63,7 @@ const getHomePage = async (req, res) => {
         }
 
         const facturas = await Facturas.find(query)
-            .sort({ fechaEmision: -1 })
+            .sort({ folio: -1 }) // Ordenar por folio en orden ascendente
             .skip(skip)
             .limit(limit);
 
@@ -78,7 +75,6 @@ const getHomePage = async (req, res) => {
         const totalFacturas = await Facturas.countDocuments(query);
         const totalPages = Math.ceil(totalFacturas / limit);
 
-        // Calcular sumatoria de facturas y notas de crédito para el mes seleccionado
         const filtroMesQuery = filtroMes ? { mes: parseInt(filtroMes) } : {};
         const filtroAnioQuery = filtroAnio ? { anio: parseInt(filtroAnio) } : {};
         const totalFacturasMes = await Facturas.aggregate([
@@ -94,7 +90,11 @@ const getHomePage = async (req, res) => {
         const montoTotalNotasCredito = totalNotasCreditoMes.length > 0 ? totalNotasCreditoMes[0].total : 0;
         const montoNetoMes = montoTotalFacturas - montoTotalNotasCredito;
 
-        // Pasar la variable success a la vista
+        // Guardar el mensaje de éxito en una variable temporal y limpiarlo inmediatamente
+        const successMessage = req.session.success || null;
+        req.session.success = null;
+        req.session.error = null;
+
         res.render('index', {
             facturas,
             currentPage: page,
@@ -108,14 +108,94 @@ const getHomePage = async (req, res) => {
             montoTotalFacturas,
             montoTotalNotasCredito,
             montoNetoMes,
-            success: req.session.success || null
+            success: successMessage,
+            user: req.user
         });
-        // Limpiar el mensaje de éxito después de renderizar
-        req.session.success = null;
     } catch (error) {
         console.error('❌ Error en getHomePage:', error.message);
         res.status(500).json({ error: 'Error al obtener facturas' });
     }
 };
 
-module.exports = { getHomePage };
+const getAgregarFactura = async (req, res) => {
+    // Obtener el último folio para sugerir el siguiente
+    const ultimaFactura = await Facturas.findOne({ tipoDTENumber: 33 })
+        .sort({ folio: -1 })
+        .select('folio');
+    const siguienteFolio = ultimaFactura ? ultimaFactura.folio + 1 : 1;
+
+    // Guardar el mensaje de error en una variable temporal y limpiarlo
+    const errorMessage = req.session.error || null;
+    req.session.error = null;
+
+    res.render('agregarFactura', {
+        title: 'Agregar Factura Manual',
+        error: errorMessage,
+        user: req.user,
+        siguienteFolio
+    });
+};
+
+const postAgregarFactura = async (req, res) => {
+    try {
+        const { folio, razonSocial, rutCliente, fechaEmision, fechaVencimiento, montoTotal, estado, contacto, correoContacto } = req.body;
+
+        // Validar folio
+        const folioNum = parseInt(folio);
+        if (isNaN(folioNum) || folioNum <= 0) {
+            throw new Error('El folio debe ser un número positivo mayor a 0.');
+        }
+        const folioExistente = await Facturas.findOne({ folio: folioNum, tipoDTENumber: 33 });
+        if (folioExistente) {
+            throw new Error('El folio ya existe. Por favor, usa un folio diferente.');
+        }
+
+        // Validar montoTotal
+        const montoTotalNum = parseFloat(montoTotal);
+        if (isNaN(montoTotalNum) || montoTotalNum <= 0) {
+            throw new Error('El monto total debe ser un número positivo mayor a 0.');
+        }
+
+        // Calcular montoNeto y montoIVA (asumiendo IVA 19%)
+        const montoIVA = Math.round(montoTotalNum * 0.19);
+        const montoNeto = Math.round(montoTotalNum - montoIVA);
+
+        // Extraer mes, año y período de fechaEmision
+        const fechaEm = new Date(fechaEmision);
+        const mes = fechaEm.getMonth() + 1;
+        const anio = fechaEm.getFullYear();
+        const periodo = `${anio}-${mes.toString().padStart(2, '0')}`;
+
+        const nuevaFactura = new Facturas({
+            folio: folioNum,
+            razonSocial,
+            rutCliente,
+            tipoDTENumber: 33,
+            tipoDTEString: 'Factura Electrónica',
+            fechaEmision: fechaEm,
+            fechaVencimiento: fechaVencimiento ? new Date(fechaVencimiento) : null,
+            montoNeto,
+            montoIVA,
+            montoTotal: montoTotalNum,
+            estado,
+            pagada: estado === 'Pagada',
+            contacto: contacto || '',
+            correoContacto: correoContacto || '',
+            mes,
+            anio,
+            periodo,
+            fechaModificacion: new Date(),
+            modificadoPor: req.user.username
+        });
+
+        await nuevaFactura.save();
+        req.session.success = 'Factura agregada exitosamente';
+        res.redirect('/');
+    } catch (error) {
+        console.error('❌ Error al agregar factura:', error.message);
+        req.session.error = 'Error al agregar factura: ' + error.message;
+        res.redirect('/agregarFactura');
+    }
+};
+
+module.exports = { getHomePage, getAgregarFactura, postAgregarFactura };

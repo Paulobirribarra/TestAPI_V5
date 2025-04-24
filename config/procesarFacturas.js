@@ -1,7 +1,20 @@
 // config/procesarFacturas.js
 const procesarFacturas = (detalleVentas) => {
     return detalleVentas.map(factura => {
-        const pagada = (factura.tipoDocReferencia === 48);
+        // Determinar si el documento es una nota de crédito
+        const esNotaDeCredito = factura.tipoDte === 61;
+
+        // Determinar si la factura está pagada (solo aplica a facturas, no a notas de crédito)
+        const pagada = !esNotaDeCredito && (factura.tipoDocReferencia === 48);
+
+        // Asignar metodoDePago basado en tipoDocReferencia (solo para facturas pagadas)
+        const metodoDePago = pagada ? 'comprobante_pago_electronico' : '';
+
+        // Asignar folioDocReferencia y numeroDeOperacion
+        const folioDocReferencia = factura.folioDocReferencia || '';
+        // Solo asignar numeroDeOperacion si es una factura pagada (no para notas de crédito)
+        const numeroDeOperacion = pagada ? folioDocReferencia : '';
+
         const fechaEmision = new Date(factura.fechaEmision);
         const fechaVencimiento = new Date(fechaEmision);
         fechaVencimiento.setDate(fechaEmision.getDate() + 30); // Sumar 30 días
@@ -17,9 +30,9 @@ const procesarFacturas = (detalleVentas) => {
             rutCliente: factura.rutCliente,
             tipoDTENumber: factura.tipoDte,
             tipoDTEString: factura.tipoDTEString,
-            folioDocReferencia: factura.folioDocReferencia || '',
+            folioDocReferencia: folioDocReferencia,
             fechaEmision: fechaEmision,
-            estado: factura.estado || (pagada ? 'Pagada' : 'Pendiente'),
+            estado: esNotaDeCredito ? 'Anulada' : (pagada ? 'Pagada' : 'Pendiente'), // Notas de crédito siempre "Anulada"
             montoNeto: factura.montoNeto,
             montoIVA: factura.montoIva,
             montoTotal: factura.montoTotal,
@@ -29,9 +42,9 @@ const procesarFacturas = (detalleVentas) => {
             mes: fechaEmision.getMonth() + 1,
             anio: fechaEmision.getFullYear(),
             pagada: pagada,
-            metodoDePago: pagada ? 'contado' : '',
+            metodoDePago: metodoDePago,
             comentario: '',
-            numeroDeOperacion: pagada ? factura.folioDocReferencia : '',
+            numeroDeOperacion: numeroDeOperacion,
             fechaVencimiento: fechaVencimiento,
             contacto: '',
             correoContacto: '',

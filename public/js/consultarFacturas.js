@@ -10,11 +10,11 @@ document.getElementById("tipoConsulta").addEventListener("change", function () {
     }
 });
 
-async function fetchConTimeout(url, timeout = 120000) {//esperar 120 segundos para la consulta
+async function fetchConTimeout(url, timeout = 120000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {
-        const response = await fetch(url, { signal: controller.signal, credentials: 'include' }); // Incluir cookies
+        const response = await fetch(url, { signal: controller.signal, credentials: 'include' });
         clearTimeout(id);
         return response;
     } catch (error) {
@@ -37,7 +37,7 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
             return;
         }
         const [anio, mes, dia] = fecha.split("-");
-        params.append("fecha", fecha); // Enviar fecha completa para procesarla en el backend
+        params.append("fecha", fecha);
     } else if (tipo === "mes") {
         const mes = document.getElementById("mes").value;
         if (!mes) {
@@ -80,7 +80,7 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
             if (data.saveResult.saved) {
                 document.getElementById("resultado").innerHTML = `
                     <div class="resultado-mensaje">
-                        ✅ Se trajeron y guardaron ${data.saveResult.count} archivos nuevos exitosamente.
+                        ✅ Se trajeron y guardaron ${data.saveResult.savedCount} facturas nuevas y se actualizaron ${data.saveResult.updatedCount} facturas exitosamente.
                     </div>
                 `;
             } else {

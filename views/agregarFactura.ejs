@@ -1,0 +1,80 @@
+<!-- views/agregarFactura.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head') %>
+    <title>Agregar Factura Manual</title>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main class="container py-4">
+        <h1 class="text-center mb-4">Agregar Factura Manual</h1>
+
+        <!-- Mostrar mensaje de error -->
+        <% if (error) { %>
+            <p class="error mb-3 text-center"><%= error %></p>
+        <% } %>
+
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <form action="/agregarFactura" method="POST" class="row g-3" id="agregarFacturaForm">
+                            <div class="col-12 form-group">
+                                <label for="folio" class="form-label"><strong>Folio</strong></label>
+                                <input type="number" class="form-control" id="folio" name="folio" min="1" value="<%= siguienteFolio %>" required>
+                                <div class="invalid-feedback">El folio debe ser un número positivo mayor a 0.</div>
+                            </div>
+                            <div class="col-12 form-group">
+                                <label for="razonSocial" class="form-label"><strong>Razón Social</strong></label>
+                                <input type="text" class="form-control" id="razonSocial" name="razonSocial" required>
+                            </div>
+                            <div class="col-12 form-group">
+                                <label for="rutCliente" class="form-label"><strong>RUT Cliente</strong></label>
+                                <input type="text" class="form-control" id="rutCliente" name="rutCliente" placeholder="Ej: 12345678-9" maxlength="10" required>
+                                <div class="invalid-feedback">El RUT debe ser válido (Ej: 12345678-9).</div>
+                            </div>
+                            <div class="col-12 form-group">
+                                <label for="fechaEmision" class="form-label"><strong>Fecha Emisión</strong></label>
+                                <input type="date" class="form-control" id="fechaEmision" name="fechaEmision" required>
+                            </div>
+                            <div class="col-12 form-group">
+                                <label for="fechaVencimiento" class="form-label"><strong>Fecha Vencimiento</strong></label>
+                                <input type="date" class="form-control" id="fechaVencimiento" name="fechaVencimiento">
+                            </div>
+                            <div class="col-12 form-group">
+                                <label for="montoTotal" class="form-label"><strong>Monto Total</strong></label>
+                                <input type="number" class="form-control" id="montoTotal" name="montoTotal" min="0.01" step="0.01" required>
+                                <div class="invalid-feedback">El monto total debe ser un número positivo mayor a 0.</div>
+                            </div>
+                            <div class="col-12 form-group">
+                                <label for="estado" class="form-label"><strong>Estado</strong></label>
+                                <select class="form-select" id="estado" name="estado" required>
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Pagada">Pagada</option>
+                                </select>
+                            </div>
+                            <div class="col-12 form-group">
+                                <label for="contacto" class="form-label"><strong>Contacto (Opcional)</strong></label>
+                                <input type="text" class="form-control" id="contacto" name="contacto">
+                            </div>
+                            <div class="col-12 form-group">
+                                <label for="correoContacto" class="form-label"><strong>Correo Contacto (Opcional)</strong></label>
+                                <input type="email" class="form-control" id="correoContacto" name="correoContacto">
+                            </div>
+                            <div class="col-12 btn-group d-flex gap-2">
+                                <button type="submit" class="btn btn-success">Guardar</button>
+                                <a href="/" class="btn btn-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+    <script src="/js/config.js"></script>
+</body>
+</html>

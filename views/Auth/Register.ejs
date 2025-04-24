@@ -13,27 +13,33 @@
                 <% if (isFirstUser) { %>
                     <p class="text-success mb-3">Este será el primer usuario y se registrará como administrador.</p>
                 <% } %>
-                <% if (error) { %>
-                    <p class="error mb-3"><%= error %></p>
+                <% if (errors && errors.general) { %>
+                    <p class="error mb-3"><%= errors.general %></p>
                 <% } %>
                 <form action="/auth/register" method="POST" id="registerForm" novalidate class="needs-validation">
                     <div class="mb-3">
                         <label for="name" class="form-label">Nombre:</label>
-                        <input type="text" id="name" name="name" class="form-control" value="<%= name %>" placeholder="Juan Pérez" required />
-                        <span id="name-error" class="error"></span>
+                        <input type="text" id="name" name="name" class="form-control" value="<%= name || '' %>" placeholder="Juan Pérez" required />
+                        <% if (errors && errors.name) { %>
+                            <span id="name-error" class="error" aria-live="polite"><%= errors.name %></span>
+                        <% } %>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Correo Electrónico:</label>
-                        <input type="email" id="email" name="email" class="form-control" value="<%= email %>" placeholder="example@test.cl" required />
-                        <span id="email-error" class="error"></span>
+                        <input type="email" id="email" name="email" class="form-control" value="<%= email || '' %>" placeholder="example@test.cl" required />
+                        <% if (errors && errors.email) { %>
+                            <span id="email-error" class="error" aria-live="polite"><%= errors.email %></span>
+                        <% } %>
                     </div>
                     <div class="mb-3 position-relative">
                         <label for="password" class="form-label">Contraseña:</label>
                         <div class="password-container">
                             <input type="password" id="password" name="password" class="form-control" placeholder="********" required />
-                            <span class="toggle-password position-absolute end-0 top-50 translate-middle-y pe-3">Mostrar</span>
+                            <span class="toggle-password position-absolute end-0 top-50 translate-middle-y pe-3" role="button" tabindex="0" aria-label="Alternar visibilidad de contraseña">Mostrar</span>
                         </div>
-                        <span id="password-error" class="error"></span>
+                        <% if (errors && errors.password) { %>
+                            <span id="password-error" class="error" aria-live="polite"><%= errors.password %></span>
+                        <% } %>
                     </div>
                     <div class="mb-3">
                         <label for="role" class="form-label">Rol:</label>

@@ -1,3 +1,4 @@
+//config/rateLimist.js
 const rateLimit = require('express-rate-limit');
 
 // Rate limit específico para la ruta de login

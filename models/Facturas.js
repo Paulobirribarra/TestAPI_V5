@@ -57,5 +57,8 @@ const modeloBDFacturas = new mongoose.Schema({
     periodo: { type: String, required: true }, // Campo añadido
 });
 
+// Agregar índice compuesto único para folio y tipoDTENumber
+modeloBDFacturas.index({ folio: 1, tipoDTENumber: 1 }, { unique: true });
+
 modeloBDFacturas.plugin(mongoosePaginate);
 module.exports = mongoose.model('Facturas', modeloBDFacturas);
