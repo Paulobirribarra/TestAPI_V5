@@ -1,4 +1,3 @@
-// public/js/consultarFacturas.js
 document.getElementById("tipoConsulta").addEventListener("change", function () {
     const tipo = this.value;
     document.getElementById("fecha-container").style.display = tipo === "dia" ? "block" : "none";
@@ -31,7 +30,7 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
 
     const tipoDocumento = document.getElementById("tipoDocumento").value;
     const tipo = document.getElementById("tipoConsulta").value;
-    let url = tipoDocumento === "compras" ? "/compras?" : "/api/consulta?";
+    let url = "/api/consultar-compras?";
 
     const params = new URLSearchParams();
     if (tipo === "dia") {
@@ -80,19 +79,11 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
 
         if (response.ok && data.consultaRealizada) {
             document.getElementById("mensajeExito").style.display = "block";
-            if (tipoDocumento === "compras") {
-                document.getElementById("resultado").innerHTML = `
-                    <div class="resultado-mensaje">
-                        ✅ Se encontraron ${data.totalCompras} compras.
-                    </div>
-                `;
-            } else {
-                document.getElementById("resultado").innerHTML = `
-                    <div class="resultado-mensaje">
-                        ✅ Se encontraron ${data.facturas.length} facturas.
-                    </div>
-                `;
-            }
+            document.getElementById("resultado").innerHTML = `
+                <div class="resultado-mensaje">
+                    ✅ Se encontraron ${data.totalCompras} compras.
+                </div>
+            `;
         } else {
             throw new Error(data.error || "No se encontraron documentos.");
         }
@@ -107,4 +98,4 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
             document.getElementById("loadingIcon").style.display = "none";
         }, 500);
     }
-});
+}); 

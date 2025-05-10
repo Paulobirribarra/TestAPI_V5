@@ -1,0 +1,57 @@
+<% function formatFecha(fecha) {
+    if (!fecha) return '';
+    const d = new Date(fecha);
+    const dia = String(d.getDate()).padStart(2, '0');
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const anio = d.getFullYear();
+    return `${dia}/${mes}/${anio}`;
+} %>
+
+<div class="card h-100">
+    <div class="card-body">
+        <% if (compra) { %>
+            <h2 class="card-title">Folio: <%= compra.folio %></h2>
+            <p class="card-text"><strong>Razón Social Emisor:</strong> <%= compra.razonSocial %></p>
+            <p class="card-text"><strong>RUT Emisor:</strong> <%= compra.rutProveedor %></p>
+            <p class="card-text"><strong>Fecha:</strong> <%= formatFecha(compra.fechaEmision) %></p>
+            <p class="card-text"><strong>Monto Neto:</strong> $<%= typeof compra.montoNeto === 'number' ? compra.montoNeto.toLocaleString() : '0' %></p>
+            <p class="card-text"><strong>IVA Recuperable:</strong> $<%= typeof compra.montoIvaRecuperable === 'number' ? compra.montoIvaRecuperable.toLocaleString() : '0' %></p>
+            <p class="card-text"><strong>Monto Total:</strong> $<%= typeof compra.montoTotal === 'number' ? compra.montoTotal.toLocaleString() : '0' %></p>
+            <p class="card-text"><strong>Tipo DTE:</strong> <%= compra.tipoDTE === 33 ? 'Factura' : (compra.tipoDTE === 61 ? 'Nota Crédito' : compra.tipoDTE) %></p>
+            <% if (compra.tipoDTE === 61 && compra.folioDocReferencia) { %>
+                <p class="card-text"><strong>Referencia:</strong> <%= compra.folioDocReferencia %></p>
+            <% } %>
+            <button class="btn btn-primary btn-ver-mas" data-bs-toggle="modal" data-bs-target="#modal-<%= compra._id %>">Ver más</button>
+        <% } else { %>
+            <p class="card-text">No hay datos disponibles.</p>
+        <% } %>
+    </div>
+</div>
+
+<% if (compra) { %>
+    <!-- Modal solo visualización -->
+    <div class="modal fade" id="modal-<%= compra._id %>" tabindex="-1" aria-labelledby="modalLabel-<%= compra._id %>" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalLabel-<%= compra._id %>">Detalles de Compra - Folio <%= compra.folio %></h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>Razón Social Emisor:</strong> <%= compra.razonSocial %></li>
+                        <li class="list-group-item"><strong>RUT Emisor:</strong> <%= compra.rutProveedor %></li>
+                        <li class="list-group-item"><strong>Fecha:</strong> <%= formatFecha(compra.fechaEmision) %></li>
+                        <li class="list-group-item"><strong>Monto Neto:</strong> $<%= typeof compra.montoNeto === 'number' ? compra.montoNeto.toLocaleString() : '0' %></li>
+                        <li class="list-group-item"><strong>IVA Recuperable:</strong> $<%= typeof compra.montoIvaRecuperable === 'number' ? compra.montoIvaRecuperable.toLocaleString() : '0' %></li>
+                        <li class="list-group-item"><strong>Monto Total:</strong> $<%= typeof compra.montoTotal === 'number' ? compra.montoTotal.toLocaleString() : '0' %></li>
+                        <li class="list-group-item"><strong>Tipo DTE:</strong> <%= compra.tipoDTE === 33 ? 'Factura' : (compra.tipoDTE === 61 ? 'Nota Crédito' : compra.tipoDTE) %></li>
+                        <% if (compra.tipoDTE === 61 && compra.folioDocReferencia) { %>
+                            <li class="list-group-item"><strong>Referencia:</strong> <%= compra.folioDocReferencia %></li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %> 

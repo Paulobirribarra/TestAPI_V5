@@ -2,9 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const indexController = require('../controllers/indexController');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
+const { isAuthenticated, isAdmin, checkPasswordSII } = require('../middleware/auth');
 const Facturas = require('../models/Facturas');
 const ConfigUserSii = require('../models/configUserSii');
+const compraController = require('../controllers/compraController');
 
 router.get('/', isAuthenticated, indexController.getHomePage);
 
@@ -17,8 +18,8 @@ router.post('/factura/update/:id', isAuthenticated, isAdmin, async (req, res) =>
     try {
         const updatedFactura = await Facturas.findByIdAndUpdate(
             id,
-            { 
-                pagada: pagada === 'on', 
+            {
+                pagada: pagada === 'on',
                 metodoDePago: metodoDePago || '',
                 comentario: comentario || '',
                 fechaDePago: fechaDePago ? new Date(fechaDePago) : null,
@@ -43,7 +44,7 @@ router.post('/factura/update/:id', isAuthenticated, isAdmin, async (req, res) =>
 
 router.get('/consulta', isAuthenticated, isAdmin, async (req, res) => {
     const configSii = await ConfigUserSii.findOne();
-    const renderData = { 
+    const renderData = {
         configSiiExists: !!configSii,
         passwordSII: req.session.passwordSII || null,
         passwordSIIExpires: req.session.passwordSIIExpires || 0,
@@ -58,8 +59,8 @@ router.post('/consulta', isAuthenticated, isAdmin, async (req, res) => {
     const { passwordSII } = req.body;
     const configSii = await ConfigUserSii.findOne();
     if (!configSii) {
-        return res.render('consultarFacturas', { 
-            error: 'Configuración SII no encontrada', 
+        return res.render('consultarFacturas', {
+            error: 'Configuración SII no encontrada',
             configSiiExists: false,
             passwordSII: null,
             passwordSIIExpires: 0,
@@ -73,8 +74,8 @@ router.post('/consulta', isAuthenticated, isAdmin, async (req, res) => {
         req.session.passwordSIIExpires = Date.now() + 2 * 60 * 60 * 1000; // 2 horas
         res.redirect('/consulta');
     } else {
-        res.render('consultarFacturas', { 
-            error: 'Contraseña SII incorrecta', 
+        res.render('consultarFacturas', {
+            error: 'Contraseña SII incorrecta',
             configSiiExists: true,
             passwordSII: null,
             passwordSIIExpires: 0,
@@ -82,5 +83,10 @@ router.post('/consulta', isAuthenticated, isAdmin, async (req, res) => {
         });
     }
 });
+
+// Rutas para compras
+router.get('/compras', compraController.renderComprasListado);
+
+router.get('/api/compras', compraController.getCompras);
 
 module.exports = router;

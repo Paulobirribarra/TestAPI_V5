@@ -7,14 +7,10 @@
             </div>
             <ul class="nav-links">
                 <% if (user) { %>
-                    <li><a href="/">Facturas</a></li>
-                    <li><a href="/notasDeCredito">Notas de Crédito</a></li>
+                    <li><a href="/">Ventas</a></li>
+                    <li><a href="/compras">Compras</a></li>
                     <li><a href="/resumenMensual">Resumen Mensual</a></li>
-                    <% if (user.role === 'admin') { %>
-                        <li><a href="/consulta">Consultar Facturas</a></li>
-                        <li><a href="/configuracion">Configuración</a></li>
-                        <li><a href="/auth/register">Registrar Usuario</a></li>
-                    <% } %>
+                    <li><a href="/notasDeCredito">Notas de Crédito</a></li>
                     <li><a href="/auth/logout">Cerrar Sesión (<%= user.name %>)</a></li>
                 <% } else { %>
                     <!-- <li><a href="/auth/login">Iniciar Sesión</a></li> -->

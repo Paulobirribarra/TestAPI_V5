@@ -32,6 +32,12 @@
       </form>
       <% } else { %>
       <form id="consulta-form">
+        <label for="tipoDocumento">Tipo de Documento:</label>
+        <select id="tipoDocumento">
+          <option value="ventas">Ventas</option>
+          <option value="compras">Compras</option>
+        </select>
+
         <label for="tipoConsulta">Tipo de Consulta:</label>
         <select id="tipoConsulta">
           <option value="dia">Por Día</option>
@@ -69,9 +75,10 @@
       <% } %>
     </main>
 
-    <%- include('partials/footer') %> <% if (configSiiExists && passwordSII &&
-    passwordSIIExpires > Date.now()) { %>
+    <%- include('partials/footer') %> 
+    <% if (configSiiExists && passwordSII && passwordSIIExpires > Date.now()) { %>
     <script src="/js/consultarFacturas.js"></script>
+    <script src="/js/consultarCompras.js"></script>
     <% } %>
   </body>
 </html>

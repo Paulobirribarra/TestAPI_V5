@@ -33,7 +33,7 @@ const fetchInvoices = async ({ fecha, mes, anio }, config, passwordSII) => {
 
     const body = {
         RutUsuario: configSii.rutUsuario,
-        PasswordSII: passwordSII, // Usar el valor plano de la sesión
+        PasswordSII: passwordSII,
         RutEmpresa: configSii.rutEmpresa,
         Ambiente: configSii.ambiente,
     };
@@ -61,6 +61,9 @@ const fetchInvoices = async ({ fecha, mes, anio }, config, passwordSII) => {
         console.timeEnd('API Response Time');
         if (error.response) {
             console.error('❌ Detalles del error de la API:', error.response.status, error.response.data);
+            if (error.response.status === 401) {
+                throw new Error('Error de autenticación. Verifica tus credenciales.');
+            }
         } else {
             console.error('❌ Error al consultar la API:', error.message);
         }
