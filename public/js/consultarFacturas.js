@@ -1,12 +1,15 @@
 // public/js/consultarFacturas.js
 document.getElementById("tipoConsulta").addEventListener("change", function () {
     const tipo = this.value;
-    document.getElementById("fecha-container").style.display = tipo === "dia" ? "block" : "none";
-    document.getElementById("mes-container").style.display = tipo === "mes" ? "block" : "none";
+    const fechaContainer = document.getElementById("fecha-container");
+    const mesContainer = document.getElementById("mes-container");
+
     if (tipo === "dia") {
-        document.getElementById("mes").value = "";
-    } else {
-        document.getElementById("fecha").value = "";
+        fechaContainer.style.display = "block";
+        mesContainer.style.display = "none";
+    } else if (tipo === "mes") {
+        fechaContainer.style.display = "none";
+        mesContainer.style.display = "block";
     }
 });
 
@@ -31,80 +34,68 @@ document.getElementById("consulta-form").addEventListener("submit", async functi
 
     const tipoDocumento = document.getElementById("tipoDocumento").value;
     const tipo = document.getElementById("tipoConsulta").value;
-    let url = tipoDocumento === "compras" ? "/compras?" : "/api/consulta?";
+    let url = "https://localhost:3000/api/consulta?";
+    const loadingIcon = document.getElementById("loadingIcon");
+    const mensajeExito = document.getElementById("mensajeExito");
+    const mensajeError = document.getElementById("mensajeError");
+    const resultado = document.getElementById("resultado");
 
-    const params = new URLSearchParams();
-    if (tipo === "dia") {
-        const fecha = document.getElementById("fecha").value;
-        if (!fecha) {
-            alert("Por favor, selecciona una fecha.");
-            return;
-        }
-        params.append("fecha", fecha);
-    } else if (tipo === "mes") {
-        const mes = document.getElementById("mes").value;
-        if (!mes) {
-            alert("Por favor, selecciona un mes.");
-            return;
-        }
-        const [anio, mesNum] = mes.split("-");
-        params.append("mes", mesNum);
-        params.append("anio", anio);
-    } else {
-        alert("Por favor, selecciona un tipo de consulta válido.");
-        return;
-    }
-
-    url += params.toString();
-    console.log("📋 URL generada para la consulta:", url);
-
-    document.getElementById("loadingIcon").style.display = "block";
-    document.getElementById("mensajeExito").style.display = "none";
-    document.getElementById("mensajeError").style.display = "none";
-    document.getElementById("resultado").innerHTML = "";
-    document.getElementById("progressBar").style.width = "0";
-
-    let progress = 0;
-    const timeout = 60000;
-    const progressInterval = setInterval(() => {
-        progress += 100 / (timeout / 1000);
-        if (progress > 100) progress = 100;
-        document.getElementById("progressBar").style.width = `${progress}%`;
-    }, 1000);
+    loadingIcon.style.display = "block";
+    mensajeExito.style.display = "none";
+    mensajeError.style.display = "none";
+    resultado.innerHTML = "";
 
     try {
-        const response = await fetchConTimeout(url, timeout);
+        if (tipo === "dia") {
+            const fecha = document.getElementById("fecha").value;
+            if (!fecha) {
+                throw new Error("Por favor, selecciona una fecha");
+            }
+            const [anio, mes, dia] = fecha.split("-");
+            url += `tipo=${tipoDocumento}&dia=${dia}&mes=${mes}&anio=${anio}`;
+        } else if (tipo === "mes") {
+            const mes = document.getElementById("mes").value;
+            if (!mes) {
+                throw new Error("Por favor, selecciona un mes");
+            }
+            const [anio, mesNum] = mes.split("-");
+            url += `tipo=${tipoDocumento}&mes=${mesNum}&anio=${anio}`;
+        } else {
+            throw new Error("Por favor, selecciona un tipo de consulta válido");
+        }
+
+        console.log("📋 URL generada para la consulta:", url);
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
         const data = await response.json();
 
-        console.log("✅ Respuesta JSON recibida:", data);
-
         if (response.ok && data.consultaRealizada) {
-            document.getElementById("mensajeExito").style.display = "block";
-            if (tipoDocumento === "compras") {
-                document.getElementById("resultado").innerHTML = `
-                    <div class="resultado-mensaje">
-                        ✅ Se encontraron ${data.totalCompras} compras.
-                    </div>
-                `;
-            } else {
-                document.getElementById("resultado").innerHTML = `
-                    <div class="resultado-mensaje">
-                        ✅ Se encontraron ${data.facturas.length} facturas.
-                    </div>
-                `;
-            }
+            mensajeExito.style.display = "block";
+            mensajeExito.textContent = `✅ Consulta realizada con éxito. Se procesaron ${data.documentos.length} documentos.`;
         } else {
-            throw new Error(data.error || "No se encontraron documentos.");
+            throw new Error(data.error || `No se encontraron ${getTipoDocumentoNombre(tipoDocumento)}`);
         }
     } catch (error) {
         console.error("❌ Error en la consulta:", error);
-        document.getElementById("mensajeError").style.display = "block";
-        document.getElementById("resultado").innerHTML = `<p style="color: red;">${error.message}</p>`;
+        mensajeError.style.display = "block";
+        mensajeError.textContent = `❌ ${error.message}`;
     } finally {
-        clearInterval(progressInterval);
-        document.getElementById("progressBar").style.width = "100%";
-        setTimeout(() => {
-            document.getElementById("loadingIcon").style.display = "none";
-        }, 500);
+        loadingIcon.style.display = "none";
     }
 });
+
+function getTipoDocumentoNombre(tipo) {
+    const tipos = {
+        'ventas': 'Factura',
+        'compras': 'Compra',
+        'notas-credito': 'Nota de Crédito',
+        'notas-debito': 'Nota de Débito'
+    };
+    return tipos[tipo] || 'Documento';
+}

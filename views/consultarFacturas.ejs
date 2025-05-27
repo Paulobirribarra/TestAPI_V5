@@ -3,14 +3,14 @@
 <html lang="es">
   <head>
     <%- include('partials/head') %>
-    <title>Consultar Facturas - FacturasApp</title>
+    <title>Consultar Documentos - FacturasApp</title>
   </head>
   <body class="flex-column">
     <%- include('partials/header') %>
 
     <main class="container flex-grow">
       <div class="title-consulta">
-        <h1>Consultar Facturas</h1>
+        <h1>Consultar Documentos</h1>
       </div>
 
       <% if (!configSiiExists) { %>
@@ -36,6 +36,8 @@
         <select id="tipoDocumento">
           <option value="ventas">Ventas</option>
           <option value="compras">Compras</option>
+          <option value="notas-credito">Notas de Crédito</option>
+          <option value="notas-debito">Notas de Débito</option>
         </select>
 
         <label for="tipoConsulta">Tipo de Consulta:</label>
@@ -71,12 +73,11 @@
       <div id="mensajeError" style="display: none">
         ❌ Error en la consulta. Inténtalo de nuevo.
       </div>
-      <section class="facturas" id="resultado"></section>
+      <section class="documentos" id="resultado"></section>
       <% } %>
     </main>
 
-    <%- include('partials/footer') %> 
-    <% if (configSiiExists && passwordSII && passwordSIIExpires > Date.now()) { %>
+    <%- include('partials/footer') %> <% if (configSiiExists && passwordSII && passwordSIIExpires > Date.now()) { %>
     <script src="/js/consultarFacturas.js"></script>
     <script src="/js/consultarCompras.js"></script>
     <% } %>

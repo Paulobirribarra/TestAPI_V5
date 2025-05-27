@@ -1,7 +1,9 @@
 // services/apiService.js
 const axios = require('axios');
 const procesarFacturas = require('../config/procesarFacturas');
+const procesarCompras = require('../config/procesarCompras');
 const ConfigUserSii = require('../models/configUserSii');
+const Config = require('../models/Config');
 
 const API_URL = process.env.API_URL || 'https://servicios.simpleapi.cl';
 
@@ -71,4 +73,67 @@ const fetchInvoices = async ({ fecha, mes, anio }, config, passwordSII) => {
     }
 };
 
-module.exports = { fetchInvoices };
+const consultarAPI = async (url, passwordSII) => {
+    try {
+        console.log('🟢 Recibida consulta con URL:', url);
+        
+        const config = await Config.findOne();
+        if (!config) {
+            throw new Error('No se encontraron datos de configuración de la API');
+        }
+
+        const configSii = await ConfigUserSii.findOne();
+        if (!configSii) {
+            throw new Error('No se encontraron datos de configuración del SII');
+        }
+
+        console.log('📤 Enviando solicitud a la API con URL:', url);
+        console.log('📤 Usuario API:', config.apiUser);
+        console.log('📤 Headers:', {
+            'Content-Type': 'application/json',
+            Authorization: `Basic ${Buffer.from(`${config.apiUser}:${config.apiKey}`).toString('base64')}`
+        });
+        console.log('📤 Body:', {
+            RutUsuario: configSii.rutUsuario,
+            PasswordSII: passwordSII,
+            RutEmpresa: configSii.rutEmpresa,
+            Ambiente: configSii.ambiente
+        });
+
+        const response = await axios.post(url, {
+            RutUsuario: configSii.rutUsuario,
+            PasswordSII: passwordSII,
+            RutEmpresa: configSii.rutEmpresa,
+            Ambiente: configSii.ambiente
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Basic ${Buffer.from(`${config.apiUser}:${config.apiKey}`).toString('base64')}`
+            }
+        });
+
+        console.log('✅ Respuesta de la API externa:', JSON.stringify(response.data, null, 2));
+
+        let documentos = [];
+        if (url.includes('/ventas/')) {
+            documentos = procesarFacturas(response.data.ventas?.detalleVentas || []);
+            console.log(`✅ Ventas procesadas: ${documentos.length}`);
+        } else if (url.includes('/compras/')) {
+            documentos = procesarCompras(response.data.compras?.detalleCompras || []);
+            console.log(`✅ Compras procesadas: ${documentos.length}`);
+        }
+
+        if (documentos.length === 0) {
+            console.log('⚠️ No se procesaron documentos.');
+            throw new Error(`No se procesaron ${url.includes('/ventas/') ? 'ventas' : 'compras'}.`);
+        }
+
+        return documentos;
+    } catch (error) {
+        console.error('❌ Error al consultar la API:', error.message);
+        console.error('❌ Detalles del error:', error);
+        throw error;
+    }
+};
+
+module.exports = { fetchInvoices, consultarAPI };

@@ -5,7 +5,8 @@ const indexController = require('../controllers/indexController');
 const { isAuthenticated, isAdmin, checkPasswordSII } = require('../middleware/auth');
 const Facturas = require('../models/Facturas');
 const ConfigUserSii = require('../models/configUserSii');
-const compraController = require('../controllers/compraController');
+const resumenMensualController = require('../controllers/resumenMensualController');
+const comprasController = require('../controllers/comprasController');
 
 router.get('/', isAuthenticated, indexController.getHomePage);
 
@@ -70,7 +71,7 @@ router.post('/consulta', isAuthenticated, isAdmin, async (req, res) => {
     const isMatch = await configSii.comparePassword(passwordSII);
     console.log('🔍 Resultado de comparación de contraseña:', isMatch);
     if (isMatch) {
-        req.session.passwordSII = passwordSII; // Guardar el valor plano en la sesión
+        req.session.passwordSII = passwordSII;
         req.session.passwordSIIExpires = Date.now() + 2 * 60 * 60 * 1000; // 2 horas
         res.redirect('/consulta');
     } else {
@@ -84,9 +85,10 @@ router.post('/consulta', isAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
-// Rutas para compras
-router.get('/compras', compraController.renderComprasListado);
+// Rutas para el resumen mensual
+router.get('/resumen-mensual', resumenMensualController.getResumenMensual);
 
-router.get('/api/compras', compraController.getCompras);
+// Rutas de facturas de compras
+router.get('/facturas-compras', isAuthenticated, comprasController.getFacturasCompras);
 
 module.exports = router;

@@ -54,11 +54,14 @@ const modeloBDFacturas = new mongoose.Schema({
     montoNoFacturable: { type: Number, default: 0 },
     indicadorVentaSinCosto: { type: Number, default: 0 },
     indicadorServicioPeriodico: { type: Number, default: 0 },
-    periodo: { type: String, required: true }, // Campo añadido
-});
+    periodo: { type: String, required: true },
+}, { timestamps: true });
 
-// Agregar índice compuesto único para folio y tipoDTENumber
+// Índice compuesto único para folio y tipoDTENumber
 modeloBDFacturas.index({ folio: 1, tipoDTENumber: 1 }, { unique: true });
+
+// Índice para búsquedas por periodo
+modeloBDFacturas.index({ periodo: 1 });
 
 modeloBDFacturas.plugin(mongoosePaginate);
 module.exports = mongoose.model('Facturas', modeloBDFacturas);

@@ -1,0 +1,88 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<div class="container mt-4">
+    <div class="card shadow-sm facturas-compras-card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Facturas de Compras</h2>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="card-body">
+            <form action="/facturas-compras" method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="mes" class="form-label">Mes</label>
+                    <select class="form-select" id="mes" name="mes">
+                        <option value="">Todos</option>
+                        <option value="1" <%= mes == 1 ? 'selected' : '' %>>Enero</option>
+                        <option value="2" <%= mes == 2 ? 'selected' : '' %>>Febrero</option>
+                        <option value="3" <%= mes == 3 ? 'selected' : '' %>>Marzo</option>
+                        <option value="4" <%= mes == 4 ? 'selected' : '' %>>Abril</option>
+                        <option value="5" <%= mes == 5 ? 'selected' : '' %>>Mayo</option>
+                        <option value="6" <%= mes == 6 ? 'selected' : '' %>>Junio</option>
+                        <option value="7" <%= mes == 7 ? 'selected' : '' %>>Julio</option>
+                        <option value="8" <%= mes == 8 ? 'selected' : '' %>>Agosto</option>
+                        <option value="9" <%= mes == 9 ? 'selected' : '' %>>Septiembre</option>
+                        <option value="10" <%= mes == 10 ? 'selected' : '' %>>Octubre</option>
+                        <option value="11" <%= mes == 11 ? 'selected' : '' %>>Noviembre</option>
+                        <option value="12" <%= mes == 12 ? 'selected' : '' %>>Diciembre</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="anio" class="form-label">Año</label>
+                    <select class="form-select" id="anio" name="anio">
+                        <option value="">Todos</option>
+                        <% for(let i = 2020; i <= new Date().getFullYear(); i++) { %>
+                            <option value="<%= i %>" <%= anio == i ? 'selected' : '' %>><%= i %></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabla de facturas -->
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center">Fecha</th>
+                        <th class="text-center">Folio</th>
+                        <th>RUT Proveedor</th>
+                        <th>Razón Social</th>
+                        <th class="text-end">Neto</th>
+                        <th class="text-end">IVA</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (facturas && facturas.length > 0) { %>
+                        <% facturas.forEach(factura => { %>
+                            <tr>
+                                <td class="text-center"><%= new Date(factura.fechaEmision).toLocaleDateString('es-ES') %></td>
+                                <td class="text-center"><%= factura.folio %></td>
+                                <td><%= factura.rutProveedor %></td>
+                                <td><%= factura.razonSocial %></td>
+                                <td class="text-end">$<%= factura.montoNeto.toLocaleString('es-ES') %></td>
+                                <td class="text-end">$<%= factura.montoIvaRecuperable.toLocaleString('es-ES') %></td>
+                                <td class="text-end fw-bold">$<%= factura.montoTotal.toLocaleString('es-ES') %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="alert alert-info mb-0">
+                                    No se encontraron facturas de compras
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %> 

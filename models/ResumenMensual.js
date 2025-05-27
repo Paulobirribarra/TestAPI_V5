@@ -1,12 +1,51 @@
 // models/ResumenMensual.js
 const mongoose = require('mongoose');
 
-const modeloBDResumenMensual = new mongoose.Schema({
-    periodo: { type: String, required: true, unique: true }, // Ej. "202408" para agosto 2024
-    totalFacturas: { type: Number, default: 0 }, // Suma de montoTotal de tipo 33
-    totalNotasCredito: { type: Number, default: 0 }, // Suma de montoTotal de tipo 61
-    montoNeto: { type: Number, default: 0 }, // totalFacturas - totalNotasCredito
-    fechaActualizacion: { type: Date, default: Date.now }
-},{ collection: 'resumenMensual' });
+const resumenMensualSchema = new mongoose.Schema({
+    periodo: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    ventas: {
+        total: {
+            type: Number,
+            default: 0
+        },
+        neto: {
+            type: Number,
+            default: 0
+        },
+        iva: {
+            type: Number,
+            default: 0
+        }
+    },
+    compras: {
+        total: {
+            type: Number,
+            default: 0
+        },
+        neto: {
+            type: Number,
+            default: 0
+        },
+        ivaRecuperable: {
+            type: Number,
+            default: 0
+        }
+    },
+    fechaActualizacion: {
+        type: Date,
+        default: Date.now
+    }
+}, {
+    timestamps: true
+});
 
-module.exports = mongoose.model('ResumenMensual', modeloBDResumenMensual);
+// Índice para búsquedas por periodo
+resumenMensualSchema.index({ periodo: 1 });
+
+const ResumenMensual = mongoose.model('ResumenMensual', resumenMensualSchema);
+
+module.exports = ResumenMensual;

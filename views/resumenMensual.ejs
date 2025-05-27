@@ -8,129 +8,128 @@
 <body class="flex-column">
     <%- include('partials/header') %>
 
-    <main class="container flex-grow">
-        <header class="page-header">
-            <h1>Resumen Mensual de Facturas</h1>
-        </header>
+    <div class="container mt-4">
+        <h2 class="mb-4">Resumen Mensual</h2>
 
-        <section class="resumen-mensual">
-            <% if (error) { %>
-                <div class="error-message"><%= error %></div>
-            <% } %>
-
-            <!-- Filtros -->
-            <div class="filters-container mb-4">
-                <form action="/resumenMensual" method="GET" class="filters-form">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label for="year" class="form-label">Año</label>
-                            <select name="year" id="year" class="form-select">
-                                <option value="">Todos los años</option>
-                                <% const currentYear = new Date().getFullYear(); %>
-                                <% for(let y = currentYear; y >= currentYear - 5; y--) { %>
-                                    <option value="<%= y %>" <%= filters.year == y ? 'selected' : '' %>><%= y %></option>
-                                <% } %>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="month" class="form-label">Mes</label>
-                            <select name="month" id="month" class="form-select">
-                                <option value="">Todos los meses</option>
-                                <% const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; %>
-                                <% months.forEach((month, index) => { %>
-                                    <option value="<%= (index + 1).toString().padStart(2, '0') %>" <%= filters.month == (index + 1).toString().padStart(2, '0') ? 'selected' : '' %>><%= month %></option>
-                                <% }) %>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="limit" class="form-label">Registros por página</label>
-                            <select name="limit" id="limit" class="form-select">
-                                <option value="10" <%= pagination.limit == 10 ? 'selected' : '' %>>10</option>
-                                <option value="25" <%= pagination.limit == 25 ? 'selected' : '' %>>25</option>
-                                <option value="50" <%= pagination.limit == 50 ? 'selected' : '' %>>50</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-                        </div>
+        <!-- Filtros -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="year" class="form-label">Año</label>
+                        <select class="form-select" id="year" name="year">
+                            <option value="">Todos los años</option>
+                            <% for(let y = new Date().getFullYear(); y >= 2020; y--) { %>
+                                <option value="<%= y %>" <%= year == y ? 'selected' : '' %>><%= y %></option>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="month" class="form-label">Mes</label>
+                        <select class="form-select" id="month" name="month">
+                            <option value="">Todos los meses</option>
+                            <% const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']; %>
+                            <% months.forEach((m, i) => { %>
+                                <option value="<%= i + 1 %>" <%= month == (i + 1) ? 'selected' : '' %>><%= m %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
                     </div>
                 </form>
             </div>
+        </div>
 
-            <% if (Object.keys(groupedResumenes).length > 0) { %>
-                <!-- Gráfico de tendencias -->
-                <div class="chart-container">
-                    <h2>Tendencias de Monto Neto por Año</h2>
-                    <canvas id="montoNetoChart"></canvas>
-                </div>
-
-                <!-- Resúmenes agrupados por año -->
-                <% Object.keys(groupedResumenes).sort().forEach(year => { %>
-                    <div class="year-section">
-                        <h2><%= year %></h2>
-                        <div class="year-totals">
-                            <p><strong>Total Facturas:</strong> $<%= yearlyTotals[year].totalFacturas.toLocaleString('es-CL') %></p>
-                            <p><strong>Total Notas de Crédito:</strong> $<%= yearlyTotals[year].totalNotasCredito.toLocaleString('es-CL') %></p>
-                            <p><strong>Monto Neto Total:</strong> $<%= yearlyTotals[year].montoNeto.toLocaleString('es-CL') %></p>
-                            <p><strong>Promedio Mensual (Monto Neto):</strong> $<%= yearlyTotals[year].averageMontoNeto.toLocaleString('es-CL') %></p>
-                            <% if (yearlyComparisons[year]) { %>
-                                <p><strong>Cambio respecto al año anterior:</strong> 
-                                    <%= yearlyComparisons[year].difference.toLocaleString('es-CL') %> 
-                                    (<%= yearlyComparisons[year].percentageChange > 0 ? '+' : '' %><%= yearlyComparisons[year].percentageChange %>%)</p>
-                            <% } %>
-                        </div>
-
-                        <div class="resumen-grid">
-                            <% groupedResumenes[year].forEach(resumen => { %>
-                                <div class="resumen-card">
-                                    <h3 class="card-title"><%= resumen.periodoFormateado %></h3>
-                                    <p><strong>Total Facturas:</strong> <span class="monto-facturas">$<%= resumen.totalFacturas.toLocaleString('es-CL') %></span></p>
-                                    <p><strong>Total Notas de Crédito:</strong> <span class="monto-notas">$<%= resumen.totalNotasCredito.toLocaleString('es-CL') %></span></p>
-                                    <p><strong>Monto Neto:</strong> <span class="monto-neto">$<%= resumen.montoNeto.toLocaleString('es-CL') %></span></p>
-                                    <p class="ultima-actualizacion"><strong>Última Actualización:</strong> <%= resumen.ultimaActualizacionFormateada %></p>
-                                </div>
-                            <% }) %>
+        <!-- Totales Generales -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Totales Ventas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="mb-1">Total Neto:</p>
+                                <p class="mb-1">IVA:</p>
+                                <p class="mb-0">Total:</p>
+                            </div>
+                            <div class="col-6 text-end">
+                                <p class="mb-1">$<%= totales.ventas.neto.toLocaleString() %></p>
+                                <p class="mb-1">$<%= totales.ventas.iva.toLocaleString() %></p>
+                                <p class="mb-0 fw-bold">$<%= totales.ventas.total.toLocaleString() %></p>
+                            </div>
                         </div>
                     </div>
-                <% }) %>
-
-                <!-- Paginación -->
-                <% if (pagination.totalPages > 1) { %>
-                    <nav aria-label="Navegación de páginas" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <% if (pagination.page > 1) { %>
-                                <li class="page-item">
-                                    <a class="page-link" href="/resumenMensual?page=<%= pagination.page - 1 %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>">Anterior</a>
-                                </li>
-                            <% } %>
-                            
-                            <% for(let i = 1; i <= pagination.totalPages; i++) { %>
-                                <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
-                                    <a class="page-link" href="/resumenMensual?page=<%= i %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>"><%= i %></a>
-                                </li>
-                            <% } %>
-
-                            <% if (pagination.page < pagination.totalPages) { %>
-                                <li class="page-item">
-                                    <a class="page-link" href="/resumenMensual?page=<%= pagination.page + 1 %>&year=<%= filters.year || '' %>&month=<%= filters.month || '' %>&limit=<%= pagination.limit %>">Siguiente</a>
-                                </li>
-                            <% } %>
-                        </ul>
-                    </nav>
-                <% } %>
-            <% } else { %>
-                <div class="no-data">
-                    <p>No hay resúmenes mensuales disponibles.</p>
-                    <p>¡Empieza consultando facturas para ver los datos aquí!</p>
                 </div>
-            <% } %>
-        </section>
-    </main>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Totales Compras</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="mb-1">Total Neto:</p>
+                                <p class="mb-1">IVA Recuperable:</p>
+                                <p class="mb-0">Total:</p>
+                            </div>
+                            <div class="col-6 text-end">
+                                <p class="mb-1">$<%= totales.compras.neto.toLocaleString() %></p>
+                                <p class="mb-1">$<%= totales.compras.ivaRecuperable.toLocaleString() %></p>
+                                <p class="mb-0 fw-bold">$<%= totales.compras.total.toLocaleString() %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Resúmenes -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Período</th>
+                                <th class="text-end">Ventas Neto</th>
+                                <th class="text-end">Ventas IVA</th>
+                                <th class="text-end">Ventas Total</th>
+                                <th class="text-end">Compras Neto</th>
+                                <th class="text-end">Compras IVA</th>
+                                <th class="text-end">Compras Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% resumenes.forEach(resumen => { %>
+                                <tr>
+                                    <td><%= resumen.periodo.substring(0, 4) %>-<%= resumen.periodo.substring(4) %></td>
+                                    <td class="text-end">$<%= (resumen.ventas?.neto || 0).toLocaleString() %></td>
+                                    <td class="text-end">$<%= (resumen.ventas?.iva || 0).toLocaleString() %></td>
+                                    <td class="text-end">$<%= (resumen.ventas?.total || 0).toLocaleString() %></td>
+                                    <td class="text-end">$<%= (resumen.compras?.neto || 0).toLocaleString() %></td>
+                                    <td class="text-end">$<%= (resumen.compras?.ivaRecuperable || 0).toLocaleString() %></td>
+                                    <td class="text-end">$<%= (resumen.compras?.total || 0).toLocaleString() %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <%- include('partials/footer') %>
-    <script id="resumenMensualData" type="application/json">
-        <%- JSON.stringify(groupedResumenes) %>
+    <script>
+        document.getElementById('filtro-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+            window.location.href = `/resumen-mensual?year=${year}${month ? `&month=${month}` : ''}`;
+        });
     </script>
-    <script src="/js/resumenMensual.js"></script>
 </body>
 </html>
